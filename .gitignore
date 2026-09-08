@@ -3,7 +3,9 @@ node_modules/
 
 # ======== 运行时数据（站长内容与上传图片，不入库） ========
 data/
-uploads/
+# 仅忽略项目根的 uploads（站长上传原图），
+# docs/uploads 是静态站要发布的图片，必须保留并提交。
+/uploads/
 
 # ======== 本地密钥（后台密码等，绝不提交到公开仓库） ========
 local-secrets.json
