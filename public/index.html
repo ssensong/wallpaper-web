@@ -115,8 +115,10 @@
           3) 保存并刷新页面即可。窗口大小可调整 CSS 中 .video-slot 的 max-width。
         -->
         <div id="videoSlot" class="video-slot">
-          <!-- 本地视频：把视频文件放到 public/video/ 目录下，文件名保持 video/tutorial.mp4 即可。 -->
-          <video src="video/tutorial.mp4" controls playsinline></video>
+          <!-- 本地视频：把视频文件放到 public/video/ 目录下，文件名保持 video/tutorial.mp4 即可。
+               preload="metadata"：页面打开时只预载几 KB 元数据，不下载 27MB 视频正文；
+               用户点播放时才流式加载（moov 在文件头部，可边下边播），避免首屏卡顿 -->
+          <video src="video/tutorial.mp4" controls playsinline preload="metadata"></video>
         </div>
       </div>
 
