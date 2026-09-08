@@ -69,6 +69,8 @@
       tab.classList.toggle('active', tab.dataset.panel === name);
     });
     window.scrollTo(0, 0);
+    // 首次切到教程页时才真正加载视频（避免打开首页就下载几十 MB 的视频）
+    if (name === 'tutorial') mountTutorialVideo();
     // 切回壁纸页时静默刷新一次，保证后台新增/修改的壁纸能及时出现
     if (name === 'wallpapers' && loadedOnce) loadWallpapers(true);
   }
@@ -247,7 +249,10 @@
   /* ---------- 加载数据 ---------- */
   // silent=true：不显示加载动画、失败不影响已有内容（用于面板切换后的静默刷新）
   async function fetchDataFrom(url) {
-    const res = await fetch(url, { cache: 'no-store' });
+    // 本地 API：必须 no-store，保证后台刚新增/修改立即可见；
+    // 静态 data.json：允许浏览器/CDN 缓存（ETag/304），二次访问更快。
+    const cache = url.indexOf('/api/') === 0 ? 'no-store' : 'default';
+    const res = await fetch(url, { cache });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!data || !Array.isArray(data.wallpapers)) throw new Error('数据格式不正确: ' + url);
@@ -365,6 +370,15 @@
   });
 
   /* ---------- 教程视频：点击播放后自动进入全屏 ---------- */
+  // 视频改为「首次切到教程页」时才真正挂载 src（data-src 懒加载），
+  // 这样打开壁纸首页时不会下载几十 MB 的视频文件。
+  function mountTutorialVideo() {
+    const video = document.querySelector('#videoSlot video');
+    if (!video || !video.dataset || video.dataset.src === undefined) return;
+    const src = video.dataset.src;
+    delete video.dataset.src; // 只挂载一次
+    if (src) video.src = src;
+  }
   (function initTutorialVideo() {
     const video = document.querySelector('#videoSlot video');
     if (!video) return;

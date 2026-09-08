@@ -63,9 +63,16 @@ function main() {
   // 2) 复制前台静态资源（排除后台文件）
   copyDirTree(PUBLIC_DIR, OUT_DIR, EXCLUDE);
 
-  // 3) 把每条壁纸的 image 由 /uploads/xxx 改为相对路径 uploads/xxx
-  //    （GitHub Pages 站点在 用户名.github.io/仓库名/ 子路径下也能正确加载）
+  // 3) 排序：与后台 /api/wallpapers 保持一致 —— 按日期倒序（最新在前），
+  //    同一天按 id 倒序（后添加的在前）。保证静态站与本地后台展示顺序一致。
   const rawList = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  rawList.sort((a, b) => {
+    const d = String(b.date || '').localeCompare(String(a.date || ''));
+    return d !== 0 ? d : (Number(b.id) || 0) - (Number(a.id) || 0);
+  });
+
+  // 把每条壁纸的 image 由 /uploads/xxx 改为相对路径 uploads/xxx
+  //    （GitHub Pages 站点在 用户名.github.io/仓库名/ 子路径下也能正确加载）
   const used = new Set();
   const warnings = [];
   const wallpapers = rawList.map((w) => {
@@ -101,7 +108,7 @@ function main() {
   used.forEach((rel) => copyInto(rel, '壁纸图片'));
   EXTRA_UPLOADS.forEach((rel) => copyInto(rel, '品牌图'));
 
-  // 5) 写静态数据 data.json + 空 .nojekyll
+  // 5) 写静态数据 data.json + 空 .nojekyll + 自定义域名 CNAME
   const outData = {
     generatedAt: new Date().toISOString(),
     count: wallpapers.length,
@@ -109,6 +116,12 @@ function main() {
   };
   fs.writeFileSync(path.join(OUT_DIR, 'data.json'), JSON.stringify(outData, null, 2), 'utf8');
   fs.writeFileSync(path.join(OUT_DIR, '.nojekyll'), '', 'utf8');
+  // GitHub Pages 绑定自定义域名时，要求发布源根目录存在 CNAME 文件；
+  // 由构建脚本自动写入，避免每次重建 docs/ 后域名绑定失效。
+  const customDomain = process.env.CUSTOM_DOMAIN || 'ranmoku.top';
+  if (customDomain) {
+    fs.writeFileSync(path.join(OUT_DIR, 'CNAME'), customDomain + '\n', 'utf8');
+  }
 
   // 6) 汇总输出
   let totalBytes = 0;
