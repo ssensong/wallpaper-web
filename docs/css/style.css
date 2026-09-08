@@ -190,9 +190,10 @@ button { font-family: inherit; }
 /* =========================================================
    壁纸网格（响应式，自适应列数）
    =======================================================*/
+/* 手机端固定两列（不随屏幕宽度变三列/双列，观感统一） */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(122px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 /* 大屏自动增列（卡片整体小巧、留出呼吸感） */
