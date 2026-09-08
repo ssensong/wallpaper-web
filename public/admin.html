@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b0d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>管理后台 · 暗格壁纸</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <!-- ==================== 登录视图（默认显示） ==================== -->
+  <section id="loginView" class="login-view">
+    <div class="login-card">
+      <div class="login-logo">◆</div>
+      <h1>壁纸管理后台</h1>
+      <p class="login-tip">请输入管理员密码</p>
+
+      <form id="loginForm" autocomplete="off">
+        <label class="field">
+          <span class="field-label">管理员密码</span>
+          <input id="loginPassword" class="input" type="password" inputmode="text"
+                 placeholder="请输入密码" required />
+        </label>
+        <button id="loginBtn" class="btn btn-primary btn-block" type="submit">登 录</button>
+      </form>
+
+      <p id="loginError" class="login-error" hidden></p>
+      <a class="back-home" href="/">← 返回壁纸首页</a>
+    </div>
+  </section>
+
+  <!-- ==================== 管理面板视图（登录后显示） ==================== -->
+  <section id="panelView" class="panel-view" hidden>
+
+    <!-- 顶部栏 -->
+    <header class="admin-top">
+      <div class="admin-top-inner">
+        <h1>壁纸管理后台</h1>
+        <div class="admin-top-actions">
+          <a class="link-home" href="/" title="查看前台">前台</a>
+          <button id="logoutBtn" class="link-home danger" type="button">退出</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <!-- 数据加载失败提示 -->
+      <div id="loadErr" class="load-err" hidden>
+        加载壁纸数据失败，请确认服务已启动或重新登录。
+        <button type="button" onclick="location.reload()">刷新页面</button>
+      </div>
+
+      <!-- 编辑 / 新增 表单区（编辑时复用，标题会变化） -->
+      <div id="editorCard" class="card-block">
+        <div class="card-head">
+          <h2 id="editorTitle">＋ 新增壁纸</h2>
+          <button id="resetFormBtn" class="btn btn-ghost btn-sm" type="button" hidden>清空 / 取消编辑</button>
+        </div>
+
+        <!-- enctype=multipart/form-data：用于携带上传的图片文件 -->
+        <form id="wallpaperForm" enctype="multipart/form-data">
+          <!-- 隐藏字段：编辑时记录当前壁纸 id -->
+          <input type="hidden" name="id" id="fId" value="" />
+
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-label">壁纸名称 <em>*</em></span>
+              <input id="fTitle" name="title" class="input" type="text"
+                     placeholder="例如：雾隐群峰" required maxlength="60" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">标签（多个用英文逗号隔开）</span>
+              <input id="fTags" name="tags" class="input" type="text"
+                     placeholder="例如：风景, 山岳, 简约" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">发布日期</span>
+              <input id="fDate" name="date" class="input" type="date" required />
+            </label>
+
+            <label class="field">
+              <span class="field-label">百度网盘分享链接</span>
+              <input id="fPan" name="panUrl" class="input" type="url"
+                     placeholder="https://pan.baidu.com/s/..." inputmode="url" />
+            </label>
+          </div>
+
+          <!-- 预览图上传（支持拍照/相册，移动端友好） -->
+          <div class="field">
+            <span class="field-label">
+              预览图片 <em id="uploadReq" hidden>*</em>
+              <span class="upload-note">编辑时留空 = 保留原图</span>
+            </span>
+            <input id="fImage" name="image" class="file-input" type="file"
+                   accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" />
+            <label class="file-pick" for="fImage">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>选择图片 / 拍照上传</span>
+            </label>
+          </div>
+          <div id="previewBox" class="preview-box" hidden>
+            <img id="previewImg" alt="预览" />
+            <p id="previewHint"></p>
+          </div>
+
+          <button id="submitBtn" class="btn btn-primary btn-block" type="submit">保存壁纸</button>
+        </form>
+      </div>
+
+      <!-- 壁纸管理列表 -->
+      <div class="card-block">
+        <div class="card-head">
+          <h2>壁纸列表 <span id="listCount" class="count-badge">0</span></h2>
+        </div>
+        <div id="manageList" class="manage-list"></div>
+        <div id="listEmpty" class="list-empty" hidden>
+          <p>还没有壁纸，先在上面新增一条吧</p>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- 轻提示 -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

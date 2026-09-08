@@ -1,0 +1,29 @@
+{
+  "name": "wallpaper-web",
+  "version": "1.0.0",
+  "description": "个人壁纸分享网站（Express 后端 + 暗黑画廊前台 + 密码保护管理后台）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "optimize": "node optimize-uploads.js",
+    "build": "node build-static.js",
+    "preview": "node preview-static.js"
+  },
+  "keywords": [
+    "wallpaper",
+    "express",
+    "gallery"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.35.4"
+  }
+}

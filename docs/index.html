@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b0d" />
+  <meta name="description" content="岚木壁纸 - 原创 iOS 交互壁纸" />
+  <title>岚木壁纸 · 原创 iOS 交互壁纸</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============ 顶部标题栏 + 顶部导航 ============ -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <!-- 圆形 logo：把你的图片放到 uploads/logo.png 即可（不存在的暂隐藏，只留圆形底） -->
+        <span class="brand-mark"><img id="brandLogo" src="uploads/logo.png" alt="岚木壁纸 logo" onerror="this.style.display='none'" /></span>
+        <div class="brand-text">
+          <h1 class="brand-name">岚木壁纸</h1>
+          <p class="brand-sub">原创 iOS 交互壁纸</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <!-- 搜索框：右上角小框（后台入口已隐藏，站长请直接访问 /admin） -->
+        <div id="searchBar" class="search-bar">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="searchInput" class="search-input" type="search" placeholder="搜索壁纸" autocomplete="off" enterkeyhint="search" aria-label="搜索壁纸" />
+          <button id="searchClear" class="search-clear" type="button" aria-label="清空搜索">&times;</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- ============ 面板一：壁纸列表 ============ -->
+    <section id="panel-wallpapers" class="panel">
+      <!-- 壁纸网格 -->
+      <div id="grid" class="grid"></div>
+
+      <!-- 分页：每 10 张一页 -->
+      <div id="pager" class="pager" hidden></div>
+
+      <!-- 加载中 / 空状态 / 出错状态 -->
+      <div id="loadState" class="state-box" hidden>
+        <div class="spinner"></div>
+        <p>正在加载壁纸…</p>
+      </div>
+      <div id="emptyState" class="state-box" hidden>
+        <p id="emptyText">暂时还没有壁纸，敬请期待</p>
+      </div>
+      <div id="errorState" class="state-box" hidden>
+        <p>内容加载失败，请检查网络后刷新页面重试</p>
+      </div>
+    </section>
+
+    <!-- ============ 面板二：使用教程 ============ -->
+    <section id="panel-tutorial" class="panel tutorial" hidden>
+      <div class="tut-hero">
+        <h2>使用教程</h2>
+        <p>交互壁纸设置教程，轻松几步即可使用</p>
+      </div>
+
+      <div class="tut-card">
+        <ol class="steps">
+          <li>
+            <b>1.</b>
+            <div>
+              <strong>前往网站进行签名（推荐使用「易签」）</strong>
+              <p>在手机浏览器中打开下方签名网站，按网站提示完成签名操作：</p>
+              <a class="tut-link" href="https://www.xiaobai51.top/#home" target="_blank" rel="noopener noreferrer">
+                打开签名网站：https://www.xiaobai51.top/#home
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </li>
+          <li>
+            <b>2.</b>
+            <div>
+              <strong>下载「3105」工具</strong>
+              <p>下载并安装 3105 工具。</p>
+              <!-- 站长：拿到 3105 工具的下载地址后，可在这里补一行 tut-link 链接 -->
+            </div>
+          </li>
+          <li>
+            <b>3.</b>
+            <div>
+              <strong>下载 .tendies 壁纸文件并导入</strong>
+              <p>获取对应的 .tendies 壁纸文件，按提示导入即可使用。</p>
+              <!-- 站长：.tendies 壁纸文件的获取/下载渠道可按你的运营方式补充说明 -->
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <!-- 视频播放器预留区：将下方占位内容替换为你的视频嵌入代码即可 -->
+      <div class="tut-card">
+        <h3>视频教程</h3>
+        <!--
+          【如何填入你自己的视频】直接编辑本文件 public/index.html：
+
+          1) 找到下面 id 为 "videoSlot" 的 div；
+          2) 将其中的占位提示内容替换为 iframe / video 嵌入代码，例如：
+
+              B站：
+             <iframe src="//player.bilibili.com/player.html?bvid=你的视频BV号&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+             腾讯视频：
+             <iframe src="//v.qq.com/txp/iframe/player.html?vid=你的视频vid" allowfullscreen="true"></iframe>
+
+             本地视频（文件放到 public/video/ 下）：
+             <video src="video/演示.mp4" controls></video>
+
+          3) 保存并刷新页面即可。窗口大小可调整 CSS 中 .video-slot 的 max-width。
+        -->
+        <div id="videoSlot" class="video-slot">
+          <!-- 本地视频：把视频文件放到 public/video/ 目录下，文件名保持 video/tutorial.mp4 即可 -->
+          <video src="video/tutorial.mp4" controls preload="metadata" playsinline></video>
+        </div>
+      </div>
+
+      <div class="tut-card">
+        <h3>常见问题</h3>
+        <div class="qa">
+          <p class="qa-q">Q：安装后提示「未受信任的开发者」怎么办？</p>
+          <p class="qa-a">A：打开手机「设置 → 通用 → VPN 与设备管理」，找到对应的开发者描述文件，点击「信任」即可正常使用。</p>
+          <p class="qa-q">Q：使用一段时间后 App 打不开了（掉签）？</p>
+          <p class="qa-a">A：说明签名已过期，重新回到第 1 步的签名网站再次签名即可恢复。</p>
+          <p class="qa-q">Q：下载链接失效了怎么办？</p>
+          <p class="qa-a">A：可稍后再试或刷新页面；如果长期失效可联系站长更新链接。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ 悬浮导航（位于屏幕底部往上约 1/4 处） ============ -->
+  <nav class="tabbar" aria-label="主导航">
+    <div class="tab-group">
+      <button class="tab active" data-panel="wallpapers" aria-label="壁纸" title="壁纸" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5L6 23"/></svg>
+        <span class="tab-label">壁纸</span>
+      </button>
+      <button class="tab" data-panel="tutorial" aria-label="教程" title="教程" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span class="tab-label">教程</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ============ 站长悬浮入口：圆形设置按钮，点击进入壁纸管理后台 ============ -->
+  <a id="fabAdmin" class="fab-admin" href="/admin" aria-label="壁纸管理后台" title="壁纸管理后台" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </a>
+
+  <!-- ============ 壁纸详情弹窗 ============ -->
+  <div id="modalBackdrop" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-label="壁纸详情">
+      <button id="modalClose" class="modal-close" type="button" aria-label="关闭">&times;</button>
+      <img id="modalImage" class="modal-image" src="" alt="壁纸预览" />
+      <div class="modal-body">
+        <h2 id="modalTitle" class="modal-title"></h2>
+        <div class="modal-date" id="modalDate"></div>
+        <div class="modal-tags" id="modalTags"></div>
+        <!-- 唯一按钮：打开网盘下载 -->
+        <a id="modalDownload" class="btn-download" href="#" target="_blank" rel="noopener noreferrer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          获取壁纸文件
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 轻提示 -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
