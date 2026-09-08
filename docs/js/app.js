@@ -69,8 +69,6 @@
       tab.classList.toggle('active', tab.dataset.panel === name);
     });
     window.scrollTo(0, 0);
-    // 首次切到教程页时才真正加载视频（避免打开首页就下载几十 MB 的视频）
-    if (name === 'tutorial') mountTutorialVideo();
     // 切回壁纸页时静默刷新一次，保证后台新增/修改的壁纸能及时出现
     if (name === 'wallpapers' && loadedOnce) loadWallpapers(true);
   }
@@ -368,38 +366,6 @@
       showToast('这张壁纸还没有填写下载链接，站长上传中…');
     }
   });
-
-  /* ---------- 教程视频：点击播放后自动进入全屏 ---------- */
-  // 视频改为「首次切到教程页」时才真正挂载 src（data-src 懒加载），
-  // 这样打开壁纸首页时不会下载几十 MB 的视频文件。
-  function mountTutorialVideo() {
-    const video = document.querySelector('#videoSlot video');
-    if (!video || !video.dataset || video.dataset.src === undefined) return;
-    const src = video.dataset.src;
-    delete video.dataset.src; // 只挂载一次
-    if (src) video.src = src;
-  }
-  (function initTutorialVideo() {
-    const video = document.querySelector('#videoSlot video');
-    if (!video) return;
-
-    video.addEventListener('play', () => {
-      // 已经处于全屏（含 iOS 原生全屏播放器）时，不再重复请求
-      if (document.fullscreenElement || video.webkitDisplayingFullscreen) return;
-      try {
-        if (typeof video.webkitEnterFullscreen === 'function') {
-          // iPhone / iPad Safari：进入系统原生全屏播放器
-          video.webkitEnterFullscreen();
-        } else if (video.requestFullscreen) {
-          // 电脑 / Android 浏览器：进入网页全屏
-          const p = video.requestFullscreen();
-          if (p && typeof p.catch === 'function') p.catch(() => {});
-        }
-      } catch (e) {
-        // 浏览器拒绝自动全屏时保持小窗播放即可
-      }
-    });
-  })();
 
   /* ---------- 站长悬浮按钮：仅已登录管理员的浏览器显示 ---------- */
   // 纯静态站（无后台 API）一律隐藏；本地后台模式下靠 /api/admin/me 判断登录态
