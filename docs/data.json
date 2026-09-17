@@ -1,7 +1,27 @@
 {
-  "generatedAt": "2026-09-16T15:30:37.545Z",
-  "count": 32,
+  "generatedAt": "2026-09-17T16:32:14.149Z",
+  "count": 35,
   "wallpapers": [
+    {
+      "id": 40,
+      "title": "珂莱塔",
+      "tags": [
+        "鸣潮"
+      ],
+      "date": "2026-09-18",
+      "panUrl": "https://pan.baidu.com/s/1V1JyChubBZFfQiDy3u4ipQ?pwd=1111",
+      "image": "uploads/mu5qxp8a-434ed9ea.jpg"
+    },
+    {
+      "id": 41,
+      "title": "帕瓦",
+      "tags": [
+        "电锯人"
+      ],
+      "date": "2026-09-16",
+      "panUrl": "https://pan.baidu.com/s/1ZpojavOEyvYSEaXL65NYtA?pwd=1111",
+      "image": "uploads/mu5qyxf5-f516cdc9.jpg"
+    },
     {
       "id": 38,
       "title": "艾莲",
@@ -131,6 +151,16 @@
       "date": "2026-08-30",
       "panUrl": "https://pan.baidu.com/s/1403umAnra-Kn8LWL9Ol5mw?pwd=1111",
       "image": "uploads/mtsneyor-a9c99cef.jpg"
+    },
+    {
+      "id": 39,
+      "title": "朝凪海",
+      "tags": [
+        "班上第二可爱的女生"
+      ],
+      "date": "2026-08-29",
+      "panUrl": "https://pan.baidu.com/s/1gZXkXwuniFktzJQnlfXi4A?pwd=1111",
+      "image": "uploads/mu5qrwo9-5ea4ef6f.jpg"
     },
     {
       "id": 19,
