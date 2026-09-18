@@ -543,7 +543,15 @@ button { font-family: inherit; }
   bottom: 0.5vh;
   transform: translateX(-50%);
   z-index: 50;
-  width: min(460px, 46vw);
+  /* 宽度随文案自适应：
+     - 中文（壁纸 / 教程）或宽屏时，宽度与原先一致（min-width 兜底）；
+     - 英文（Wallpapers / Guide）标签更长，按内容自动加宽，避免文字挤出胶囊；
+     - 上限不超过屏幕宽度。
+     注意：此处必须用 max-content（而非 fit-content）——本元素是 fixed + left:50%，
+     fit-content 的可用宽度只有左半边，会把英文标签再次卡窄。 */
+  width: max-content;
+  min-width: min(460px, 46vw);
+  max-width: calc(100vw - 16px);
   display: flex;
   gap: 4px;
   padding: 4px;
@@ -557,9 +565,13 @@ button { font-family: inherit; }
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 .tab-group {
-  display: flex;
+  /* 两列等宽：以较长的那个标签为准，中英文都不会出现一宽一窄 */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
-  flex: 1;
+  /* flex-basis 必须为 auto：若写成 flex:1（basis 0），
+     父级 .tabbar 的 max-content 会算成 0，宽度自适应就失效了 */
+  flex: 1 1 auto;
 }
 .tab {
   flex: 1;
@@ -569,6 +581,7 @@ button { font-family: inherit; }
   gap: 5px;
   height: 40px;
   min-width: 44px;
+  padding: 0 14px;
   background: none; border: none;
   color: rgba(255, 255, 255, 0.62);
   border-radius: 14px;
@@ -578,6 +591,8 @@ button { font-family: inherit; }
 }
 .tab svg { width: 20px; height: 20px; flex: none; transition: transform .22s; }
 .tab-label { font-size: 12.5px; font-weight: 600; line-height: 1; letter-spacing: 1px; }
+/* 英文标签：拉丁字母不需要中文那样的字距，收紧后更紧凑、也更不易顶到胶囊边缘 */
+html[lang="en"] .tab-label { font-size: 12px; letter-spacing: .2px; }
 .tab:active { transform: scale(.97); }
 .tab.active {
   color: #fff;
