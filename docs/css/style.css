@@ -188,6 +188,39 @@ button { font-family: inherit; }
 .search-clear:hover { background: rgba(255, 255, 255, 0.22); }
 
 /* =========================================================
+   语言切换按钮（搜索框左侧）
+   =======================================================*/
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 9px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-sub);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.lang-toggle:hover { color: var(--text); border-color: #4b4b56; background: rgba(255, 255, 255, 0.09); }
+.lang-toggle:active { transform: scale(0.96); }
+.lang-icon { width: 13px; height: 13px; flex: 0 0 auto; }
+.lang-label { letter-spacing: .5px; min-width: 12px; text-align: center; }
+/* 英文品牌名更长：窄屏隐藏副标题，避免顶栏拥挤换行 */
+@media (max-width: 480px) {
+  html[lang="en"] .brand-sub { display: none; }
+  .lang-toggle { padding: 0 7px; gap: 3px; }
+}
+
+/* =========================================================
    壁纸网格（响应式，自适应列数）
    =======================================================*/
 /* 手机端固定两列（不随屏幕宽度变三列/双列，观感统一） */

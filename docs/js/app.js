@@ -10,6 +10,10 @@
 (function () {
   'use strict';
 
+  /* ---------- 多语言（词库与语言判断由 js/i18n.js 提供） ---------- */
+  const I18N = window.I18N;
+  const t = (key, vars) => I18N.t(key, vars);
+
   /* ---------- DOM 引用 ---------- */
   const $ = (sel) => document.querySelector(sel);
   const grid = $('#grid');
@@ -48,11 +52,9 @@
     toastTimer = setTimeout(() => { toast.hidden = true; }, 2200);
   }
 
-  /* ---------- 日期格式化：2026-08-28 -> 2026年8月28日 ---------- */
+  /* ---------- 日期格式化：中文 2026年8月28日 / 英文 Aug 28, 2026 ---------- */
   function fmtDate(str) {
-    const parts = String(str || '').split('-');
-    if (parts.length !== 3) return str || '';
-    return `${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`;
+    return I18N.fmtDate(str);
   }
 
   /* ---------- 底部导航：壁纸 / 使用教程 切换 ---------- */
@@ -76,16 +78,16 @@
     tab.addEventListener('click', () => switchPanel(tab.dataset.panel));
   });
 
-  /* ---------- 构建标签小胶囊（最多展示前 3 个） ---------- */
+  /* ---------- 构建标签小胶囊（最多展示前 3 个，英文界面自动翻译） ---------- */
   function buildTags(w) {
-    const tags = w.tags || [];
+    const tags = I18N.tags(w);
     if (!tags.length) return null;
     const row = document.createElement('div');
     row.className = 'card-tags';
-    tags.slice(0, 3).forEach((t) => {
+    tags.slice(0, 3).forEach((name) => {
       const s = document.createElement('span');
       s.className = 'tag-mini';
-      s.textContent = t;
+      s.textContent = name;
       row.appendChild(s);
     });
     if (tags.length > 3) {
@@ -105,8 +107,8 @@
       grid.hidden = false;
       emptyState.hidden = false;
       emptyText.textContent = keyword.trim()
-        ? '没有找到与「' + keyword.trim() + '」相关的壁纸'
-        : '暂时还没有壁纸，敬请期待';
+        ? t('search.noResult', { q: keyword.trim() })
+        : t('state.empty');
       return;
     }
     emptyState.hidden = true;
@@ -115,16 +117,17 @@
     // DocumentFragment 一次性插入，减少重排
     const frag = document.createDocumentFragment();
     list.forEach((w) => {
+      const title = I18N.title(w);
       const card = document.createElement('div');
       card.className = 'card';
       card.dataset.id = w.id;
       card.setAttribute('role', 'button');
       card.setAttribute('tabindex', '0');
-      card.setAttribute('aria-label', `查看壁纸：${w.title}`);
+      card.setAttribute('aria-label', t('card.aria', { title: title }));
 
       const img = document.createElement('img');
       img.src = w.image || '';
-      img.alt = w.title;
+      img.alt = title;
       img.loading = 'lazy'; // 懒加载，首屏更流畅
 
       // 透明信息框：名称 + 标签放一起
@@ -132,7 +135,7 @@
       info.className = 'card-info';
       const nameEl = document.createElement('div');
       nameEl.className = 'card-name';
-      nameEl.textContent = w.title;
+      nameEl.textContent = title;
       info.appendChild(nameEl);
       const tagsRow = buildTags(w);
       if (tagsRow) info.appendChild(tagsRow);
@@ -219,10 +222,9 @@
     return word.length >= 2 && subseqHit(t, word);
   }
   function itemMatch(w, words) {
-    return words.every((word) =>
-      wordHit(w.title, word) ||
-      (w.tags || []).some((tag) => wordHit(tag, word))
-    );
+    // 中英文都参与匹配：中文界面下也能用英文名 / 英文标签搜到
+    const hay = [w.title, I18N.title(w)].concat(w.tags || [], I18N.tags(w));
+    return words.every((word) => hay.some((text) => wordHit(text, word)));
   }
 
   function applyFilter() {
@@ -289,17 +291,21 @@
   }
 
   /* ---------- 打开 / 关闭详情弹窗 ---------- */
+  let currentWallpaper = null; // 当前弹窗对应的壁纸（切换语言时用于重绘）
+
   function openModal(w) {
     if (!w) return;
+    currentWallpaper = w;
     modalImage.src = w.image || '';
-    modalTitle.textContent = w.title || '未命名壁纸';
-    modalDate.textContent = '发布日期：' + fmtDate(w.date);
-    // 多标签分别显示
+    modalImage.alt = I18N.title(w) || t('modal.imageAlt');
+    modalTitle.textContent = I18N.title(w) || t('modal.untitled');
+    modalDate.textContent = t('modal.date') + fmtDate(w.date);
+    // 多标签分别显示（英文界面自动翻译）
     modalTags.innerHTML = '';
-    (w.tags || []).forEach((t) => {
+    I18N.tags(w).forEach((name) => {
       const pill = document.createElement('span');
       pill.className = 'tag-pill';
-      pill.textContent = t;
+      pill.textContent = name;
       modalTags.appendChild(pill);
     });
     modalDownload.href = w.panUrl || '#'; // 新标签页直接打开网盘链接
@@ -363,8 +369,14 @@
   modalDownload.addEventListener('click', (e) => {
     if (modalDownload.dataset.hasLink !== '1') {
       e.preventDefault();
-      showToast('这张壁纸还没有填写下载链接，站长上传中…');
+      showToast(t('modal.noLink'));
     }
+  });
+
+  /* ---------- 语言切换：重绘已渲染内容（静态文案由 i18n.js 负责） ---------- */
+  document.addEventListener('langchange', () => {
+    applyFilter();
+    if (currentWallpaper && !modalBackdrop.hidden) openModal(currentWallpaper);
   });
 
   /* ---------- 站长悬浮按钮：仅已登录管理员的浏览器显示 ---------- */
