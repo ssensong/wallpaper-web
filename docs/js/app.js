@@ -394,6 +394,39 @@
     if (!document.hidden) syncFabAdmin();
   });
 
+  /* ---------- 移动端手势兜底：禁止缩放 / 双击放大 / 横向拖动 ----------
+     iOS Safari 从 iOS 10 起会忽略 viewport 的 user-scalable=no，
+     因此除了 CSS 的 touch-action: pan-y 之外，再用事件拦截兜底（双保险）。 */
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((evt) => {
+    document.addEventListener(evt, (e) => e.preventDefault(), { passive: false });
+  });
+  // 双指触摸（捏合缩放）直接拦掉
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  // 300ms 内的第二次点击视为双击放大，阻止之（输入框/文本域除外，避免影响输入）
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    const tag = (e.target && e.target.tagName) || '';
+    if (now - lastTouchEnd <= 300 && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, { passive: false });
+
+  /* ---------- 禁止长按保存图片 ----------
+     iOS 侧由 CSS 的 -webkit-touch-callout: none 负责；
+     安卓长按会触发 contextmenu，这里拦掉；桌面端顺带禁掉图片拖拽。 */
+  document.addEventListener('contextmenu', (e) => {
+    const el = e.target;
+    if (el && (el.tagName === 'IMG' || (el.closest && el.closest('img')))) e.preventDefault();
+  });
+  document.addEventListener('dragstart', (e) => {
+    const el = e.target;
+    if (el && el.tagName === 'IMG') e.preventDefault();
+  });
+
   /* ---------- 启动 ---------- */
   syncClear();
   loadWallpapers();

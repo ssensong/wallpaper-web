@@ -31,7 +31,16 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  /* ---------- 移动端：防"晃动"、防缩放 ----------
+     overflow-x: clip   内容不横向溢出；且不像 hidden 那样产生滚动容器，顶栏 sticky 不受影响
+     touch-action: pan-y 只允许上下滑动 —— 屏蔽「单指左右拖动」（页面来回晃）、双指缩放、双击放大
+     注意：这里不要写 overscroll-behavior: none —— 它会把下拉刷新一起禁掉；
+           防晃动只靠 pan-y 即可，纵向滑动与下拉刷新都不受影响 */
+  overflow-x: clip;
+  touch-action: pan-y;
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI",
@@ -46,7 +55,18 @@ body {
   padding-bottom: calc(0.5vh + 90px);
 }
 
-img { display: block; max-width: 100%; }
+img {
+  display: block;
+  max-width: 100%;
+  /* 禁止长按保存图片：
+     -webkit-touch-callout 屏蔽 iOS 长按弹出的「存储图像 / 拷贝」菜单；
+     user-select / user-drag 屏蔽选中与拖拽 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; }
 
@@ -97,9 +117,20 @@ button { font-family: inherit; }
   object-fit: cover;
   display: block;
 }
-.brand-name { font-size: 17px; font-weight: 700; letter-spacing: 1px; line-height: 1.2; white-space: nowrap; }
+/* 窄屏可收缩并省略号截断：避免顶栏把页面撑宽（横向溢出会让页面能被左右拖动） */
+.brand-name { font-size: 17px; font-weight: 700; letter-spacing: 1px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .brand-text { min-width: 0; }
-.brand-sub { font-size: 12px; color: var(--muted); line-height: 1.3; white-space: nowrap; }
+.brand-sub { font-size: 12px; color: var(--muted); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 英文品牌：两行词标 —— Ranmoku / wallpaper
+   两行使用同一字体样式（同样的粗细、颜色、字距），第二行字号适当收小形成主次关系 */
+html[lang="en"] .brand-name { letter-spacing: .5px; }
+html[lang="en"] .brand-sub {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 1px;
+  line-height: 1.12;
+}
 .admin-link {
   display: inline-flex; align-items: center; gap: 5px;
   height: 34px; padding: 0 12px;
@@ -214,9 +245,9 @@ button { font-family: inherit; }
 .lang-toggle:active { transform: scale(0.96); }
 .lang-icon { width: 13px; height: 13px; flex: 0 0 auto; }
 .lang-label { letter-spacing: .5px; min-width: 12px; text-align: center; }
-/* 英文品牌名更长：窄屏隐藏副标题，避免顶栏拥挤换行 */
+/* 英文两行词标：窄屏时第二行字号同步收小，保证顶栏不拥挤 */
 @media (max-width: 480px) {
-  html[lang="en"] .brand-sub { display: none; }
+  html[lang="en"] .brand-sub { font-size: 11.5px; }
   .lang-toggle { padding: 0 7px; gap: 3px; }
 }
 
@@ -383,13 +414,15 @@ button { font-family: inherit; }
   background: rgba(4, 4, 6, 0.78);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  padding: 16px;
+  /* 四周留出更大的空白区：用户点空白处即可退出预览 */
+  padding: 28px 18px;
   animation: fadeIn .2s ease;
 }
 .modal {
   position: relative;
-  width: min(520px, 100%);
-  max-height: 90vh;
+  /* 整体收敛：卡片更小，四周空白更多，关闭按钮也更靠近拇指 */
+  width: min(430px, 100%);
+  max-height: 74vh;
   overflow-y: auto;
   background: var(--bg-soft);
   border: 1px solid var(--line);
@@ -413,28 +446,28 @@ button { font-family: inherit; }
 .modal-close:hover { background: rgba(10, 10, 12, .9); }
 .modal-image {
   width: 100%;
-  max-height: 58vh;
+  max-height: 42vh;
   object-fit: cover;
   background: var(--card);
 }
-.modal-body { padding: 16px 18px 20px; }
-.modal-title { font-size: 19px; font-weight: 700; margin-bottom: 2px; }
+.modal-body { padding: 14px 16px 16px; }
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
 .modal-date {
   font-size: 12.5px; color: var(--muted);
   display: flex; align-items: center; gap: 5px;
   margin-bottom: 12px;
 }
-.modal-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.modal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 13px; }
 .modal-tags .tag-pill {
-  font-size: 12px; color: var(--text-sub);
+  font-size: 11.5px; color: var(--text-sub);
   background: var(--card); border: 1px solid var(--line);
-  padding: 4px 11px; border-radius: 999px;
+  padding: 3px 9px; border-radius: 999px;
 }
 /* 唯一的下载按钮 */
 .btn-download {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; padding: 13px;
-  font-size: 15.5px; font-weight: 600;
+  width: 100%; padding: 11px;
+  font-size: 14.5px; font-weight: 600;
   color: var(--accent-ink);
   background: linear-gradient(140deg, #ffffff, #cfcfd6);
   border-radius: var(--r-md);
@@ -509,12 +542,14 @@ button { font-family: inherit; }
 }
 .steps strong { font-size: 14.5px; display: block; }
 .steps p { color: var(--muted); font-size: 13px; }
-/* 步骤里的外部链接按钮（自签网站 / 网盘） */
+/* 步骤里的外部链接按钮（自签网站 / 网盘）
+   紧凑胶囊样式：宽度贴合文字（不再拉满整行），内边距收紧，长度更短 */
 .steps .tut-link {
-  display: flex; align-items: center; gap: 7px;
-  width: 100%;
+  display: inline-flex; align-items: center; gap: 7px;
+  width: auto;
+  max-width: 100%;
   margin-top: 9px;
-  padding: 12px 14px;
+  padding: 9px 13px;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
