@@ -22,18 +22,24 @@
         </div>
       </div>
       <div class="topbar-actions">
-        <!-- 语言切换：位于搜索框左侧，点击在「中 / EN」之间切换。
+        <!-- 搜索入口：默认是一个较宽的放大镜按钮，点击后展开为搜索框 -->
+        <button id="searchToggle" class="search-toggle" type="button" aria-expanded="false" aria-label="搜索" data-i18n-aria="search.open">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <!-- 筛选生效时显示的小亮点 -->
+          <span class="search-dot" aria-hidden="true"></span>
+        </button>
+        <!-- 语言切换：仅显示地球图标，点击在中 / 英之间切换。
              首次访问按 时区 + 浏览器语言 自动判断（非中国大陆 → 英文）。 -->
         <button id="langToggle" class="lang-toggle" type="button" data-i18n-aria="lang.aria">
           <svg class="lang-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
-          <span id="langLabel" class="lang-label">中</span>
         </button>
-        <!-- 搜索框：右上角小框（后台入口已隐藏，站长请直接访问 /admin） -->
+        <!-- 搜索框（默认收起；后台入口已隐藏，站长请直接访问 /admin） -->
         <div id="searchBar" class="search-bar">
           <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="searchInput" class="search-input" type="search" placeholder="搜索壁纸" autocomplete="off" enterkeyhint="search" aria-label="搜索壁纸" data-i18n-ph="search.placeholder" data-i18n-aria="search.placeholder" />
-          <button id="searchClear" class="search-clear" type="button" aria-label="清空搜索" data-i18n-aria="search.clear">&times;</button>
+          <input id="searchInput" class="search-input" type="search" placeholder="搜索" autocomplete="off" enterkeyhint="search" aria-label="搜索" data-i18n-ph="search.placeholder" data-i18n-aria="search.placeholder" />
         </div>
+        <!-- 清除按钮：独立的圆形按钮，位于搜索框「外部」右侧（有内容时方可点击） -->
+        <button id="searchClear" class="search-clear" type="button" aria-label="清空搜索" data-i18n-aria="search.clear">&times;</button>
       </div>
     </div>
   </header>

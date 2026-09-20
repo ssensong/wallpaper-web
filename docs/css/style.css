@@ -89,7 +89,7 @@ button { font-family: inherit; }
 .topbar-inner {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 10px 16px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -143,7 +143,8 @@ html[lang="en"] .brand-sub {
 .admin-link:hover { color: var(--text); border-color: #3a3a43; background: rgba(255, 255, 255, 0.04); }
 /* 窄屏：压缩品牌，给右侧搜索框让位 */
 @media (max-width: 480px) {
-  .topbar-inner { padding: 8px 12px; }
+  /* 左右内边距与 .page 保持一致（16px），让搜索框右边缘与壁纸卡片右边缘对齐 */
+  .topbar-inner { padding: 12px 16px; }
   .brand { gap: 8px; }
   .brand-mark { width: 34px; height: 34px; }
   .brand-name { font-size: 15px; letter-spacing: .5px; }
@@ -161,14 +162,51 @@ html[lang="en"] .brand-sub {
 /* =========================================================
    右上角搜索框（小框）
    =======================================================*/
+/* 搜索入口按钮（收起态显示）：比语言按钮宽一些的胶囊形 */
+.search-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 32px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-sub);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.search-toggle svg { width: 15px; height: 15px; }
+.search-toggle:hover { color: var(--text); border-color: #4b4b56; background: rgba(255, 255, 255, 0.09); }
+.search-toggle:active { transform: scale(0.96); }
+/* 收起后仍有关键词：按钮高亮 + 右上角小亮点，提示正在筛选 */
+.search-toggle.has-keyword { color: var(--text); border-color: #4b4b56; }
+.search-dot {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f2f2f3;
+}
+.search-toggle.has-keyword .search-dot { display: block; }
+
 .search-bar {
   position: relative;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-width: 0;
+  display: none; /* 默认收起：只显示放大镜按钮，点击后由 .search-open 展开 */
 }
 .search-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 1;
@@ -177,11 +215,12 @@ html[lang="en"] .brand-sub {
   width: 12px; height: 12px;
 }
 .search-input {
-  width: 100px;
-  height: 26px;
-  padding: 0 18px 0 18px;
+  /* 展开后占满搜索条宽度 */
+  width: 100%;
+  height: 32px;
+  padding: 0 19px;
   /* 页面已禁用缩放(user-scalable=no)，字号可自由缩小且 iOS 点击输入框不会放大页面 */
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text);
   text-align: center;
   background: rgba(255, 255, 255, 0.05);
@@ -200,23 +239,48 @@ html[lang="en"] .brand-sub {
   background: rgba(255, 255, 255, 0.07);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
 }
+/* 清除按钮：位于搜索框「外部」的独立圆形按钮（只在搜索展开时出现） */
 .search-clear {
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px; height: 16px;
-  display: grid; place-items: center;
-  border: none; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.13);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-sub);
-  font-size: 11px; line-height: 1;
+  font-size: 16px; line-height: 1;
   cursor: pointer;
-  opacity: 0; pointer-events: none;
-  transition: opacity .2s, background .2s;
+  opacity: .4;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: color .2s, background .2s, border-color .2s, opacity .2s;
 }
+.topbar.search-open .search-clear { display: inline-flex; }
+/* 有输入内容时才可点（空的时候淡化，避免误触） */
 .search-clear.show { opacity: 1; pointer-events: auto; }
-.search-clear:hover { background: rgba(255, 255, 255, 0.22); }
+.search-clear.show:hover { color: var(--text); border-color: #4b4b56; background: rgba(255, 255, 255, 0.12); }
+.search-clear.show:active { transform: scale(.96); }
+
+/* 展开态（点击放大镜按钮后）：品牌区保留，语言切换按钮让位，
+   搜索框改为紧凑尺寸，清除按钮独立在搜索框外右侧；整组右边缘与壁纸卡片右边缘齐平 */
+.topbar.search-open .topbar-actions { flex: 0 1 auto; min-width: 0; }
+.topbar.search-open .search-toggle { display: none; }
+.topbar.search-open .lang-toggle { display: none; }
+.topbar.search-open .search-bar {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 120px;
+  max-width: 240px;
+  animation: searchIn .2s ease;
+}
+.topbar.search-open .search-input { width: 100%; }
+@keyframes searchIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: none; }
+}
 
 /* =========================================================
    语言切换按钮（搜索框左侧）
@@ -224,15 +288,17 @@ html[lang="en"] .brand-sub {
 .lang-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  height: 26px;
-  padding: 0 9px;
+  justify-content: center;
+  /* 只保留地球图标：做成更小的圆形按钮 */
+  width: 30px;
+  height: 30px;
+  padding: 0;
   flex: 0 0 auto;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-sub);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
@@ -243,12 +309,10 @@ html[lang="en"] .brand-sub {
 }
 .lang-toggle:hover { color: var(--text); border-color: #4b4b56; background: rgba(255, 255, 255, 0.09); }
 .lang-toggle:active { transform: scale(0.96); }
-.lang-icon { width: 13px; height: 13px; flex: 0 0 auto; }
-.lang-label { letter-spacing: .5px; min-width: 12px; text-align: center; }
+.lang-icon { width: 14px; height: 14px; flex: 0 0 auto; }
 /* 英文两行词标：窄屏时第二行字号同步收小，保证顶栏不拥挤 */
 @media (max-width: 480px) {
   html[lang="en"] .brand-sub { font-size: 11.5px; }
-  .lang-toggle { padding: 0 7px; gap: 3px; }
 }
 
 /* =========================================================

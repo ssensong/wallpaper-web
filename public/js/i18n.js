@@ -28,7 +28,9 @@
       'brand.name': '岚木壁纸',
       'brand.sub': '原创 iOS 交互壁纸',
 
-      'search.placeholder': '搜索壁纸',
+      'search.placeholder': '搜索',
+      'search.open': '搜索',
+      'search.close': '收起搜索',
       'search.clear': '清空搜索',
       'lang.aria': '切换语言（中文 / English）',
 
@@ -77,6 +79,8 @@
       'brand.sub': 'wallpaper',
 
       'search.placeholder': 'Search',
+      'search.open': 'Search',
+      'search.close': 'Close search',
       'search.clear': 'Clear search',
       'lang.aria': 'Switch language (中文 / English)',
 

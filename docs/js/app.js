@@ -19,6 +19,8 @@
   const grid = $('#grid');
   const searchInput = $('#searchInput');
   const searchClear = $('#searchClear');
+  const searchToggle = $('#searchToggle'); // 搜索入口按钮（点击展开搜索框）
+  const topbar = $('.topbar');
   const loadState = $('#loadState');
   const emptyState = $('#emptyState');
   const emptyText = $('#emptyText');
@@ -241,9 +243,13 @@
     renderPager(list.length);
   }
 
-  /* ---------- 清空按钮显隐 ---------- */
+  /* ---------- 清空按钮显隐 + 搜索按钮的「筛选中」标记 ---------- */
   function syncClear() {
     searchClear.classList.toggle('show', Boolean(searchInput.value));
+    if (searchToggle) {
+      // 收起后仍有关键词时，入口按钮高亮并显示小亮点，提示当前处于筛选状态
+      searchToggle.classList.toggle('has-keyword', Boolean(searchInput.value.trim()));
+    }
   }
 
   /* ---------- 加载数据 ---------- */
@@ -330,15 +336,71 @@
     syncClear();
     applyFilter();
   });
-  // 点 × 清空搜索
+  // 点 × 清空搜索，并同时收起搜索框、关闭软键盘
   searchClear.addEventListener('click', () => {
     searchInput.value = '';
     keyword = '';
     page = 1;
     syncClear();
     applyFilter();
-    searchInput.focus();
+    clearTimeout(searchBlurTimer);
+    searchInput.blur();   // 关闭软键盘
+    closeSearch();        // 收起搜索框
   });
+
+  /* ---------- 搜索框展开 / 收起 ----------
+     默认只显示放大镜按钮，点击后展开为搜索框（展开时品牌区让位，输入框占满剩余宽度）。
+     失焦自动收起；已输入的关键词会保留，入口按钮上以小亮点提示。 */
+  let searchBlurTimer = null;
+  function setSearchOpen(open) {
+    if (!topbar || !searchToggle) return;
+    topbar.classList.toggle('search-open', open);
+    searchToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    searchToggle.setAttribute('aria-label', I18N.t(open ? 'search.close' : 'search.open'));
+    if (open) {
+      try { searchInput.focus(); } catch (e) { /* 忽略 */ }
+      // 个别浏览器刚显示出来时聚焦不生效，补一次
+      if (document.activeElement !== searchInput) {
+        setTimeout(() => { try { searchInput.focus(); } catch (e) { /* 忽略 */ } }, 60);
+      }
+    }
+  }
+  // 收起搜索：同时让输入框失焦，软键盘随之关闭
+  function closeSearch() {
+    clearTimeout(searchBlurTimer);
+    try { searchInput.blur(); } catch (e) { /* 忽略 */ }
+    setSearchOpen(false);
+  }
+  if (searchToggle && topbar) {
+    searchToggle.addEventListener('click', () => {
+      if (topbar.classList.contains('search-open')) {
+        closeSearch();
+      } else {
+        setSearchOpen(true);
+      }
+    });
+    // 失焦延迟收起：留出点击「×」清空按钮的时间（点 × 会先失焦，故给了这段缓冲）
+    searchInput.addEventListener('focus', () => { clearTimeout(searchBlurTimer); });
+    searchInput.addEventListener('blur', () => {
+      clearTimeout(searchBlurTimer);
+      searchBlurTimer = setTimeout(() => setSearchOpen(false), 170);
+    });
+    // 触碰到搜索区域以外的任何位置：立刻收起搜索并关闭软键盘
+    // （iOS 上点空白处不一定会让输入框失焦，这里主动兜底）
+    document.addEventListener('touchstart', (e) => {
+      if (!topbar.classList.contains('search-open')) return;
+      const el = e.target;
+      if (el && el.closest && el.closest('.topbar')) return; // 顶栏内部（搜索框、× 按钮）不处理
+      closeSearch();
+    }, { passive: true });
+    // Esc 收起搜索（预览弹窗打开时优先关弹窗）
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && topbar.classList.contains('search-open') && modalBackdrop.hidden) {
+        setSearchOpen(false);
+        searchInput.blur();
+      }
+    });
+  }
 
   // 点击壁纸卡片 -> 打开详情
   grid.addEventListener('click', (e) => {
