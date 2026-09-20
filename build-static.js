@@ -17,6 +17,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, 'public');
@@ -44,6 +45,38 @@ function copyDirTree(src, dst, exclude) {
     if (ent.isDirectory()) copyDirTree(from, to, exclude);
     else fs.copyFileSync(from, to);
   }
+}
+
+/**
+ * 给 docs/index.html 里的 css/js 引用加上内容指纹（?v=xxxx）
+ *
+ * 为什么需要：静态资源会被 Cloudflare 和浏览器缓存，推送到 GitHub Pages 后
+ * 用户可能十几分钟内仍看到旧样式。加上内容指纹后每次构建的 URL 都不同，
+ * CDN 与浏览器都会当成新文件去源站拉取，免去手动「清除缓存」。
+ * 只改 docs/ 里的产物，源文件 public/index.html 保持干净。
+ */
+function stampAssetUrls() {
+  const file = path.join(OUT_DIR, 'index.html');
+  if (!fs.existsSync(file)) return [];
+
+  const hashOf = (rel) => {
+    const abs = path.join(OUT_DIR, rel);
+    if (!fs.existsSync(abs)) return '';
+    return crypto.createHash('md5').update(fs.readFileSync(abs)).digest('hex').slice(0, 8);
+  };
+
+  let html = fs.readFileSync(file, 'utf8');
+  const stamped = [];
+  ['css/style.css', 'js/i18n.js', 'js/app.js'].forEach((rel) => {
+    const h = hashOf(rel);
+    if (!h) return;
+    const escaped = rel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(escaped + '(\\?v=[0-9a-f]+)?', 'g');
+    html = html.replace(re, rel + '?v=' + h);
+    stamped.push(rel + '?v=' + h);
+  });
+  fs.writeFileSync(file, html, 'utf8');
+  return stamped;
 }
 
 function main() {
@@ -123,6 +156,11 @@ function main() {
     fs.writeFileSync(path.join(OUT_DIR, 'CNAME'), customDomain + '\n', 'utf8');
   }
 
+  // 5.5) 静态资源加内容指纹：
+  //      css/js 引用带上 ?v=内容哈希，避免 Cloudflare / 浏览器缓存
+  //      导致推送上线后用户十几分钟内还看到旧样式
+  const stamped = stampAssetUrls();
+
   // 6) 汇总输出
   let totalBytes = 0;
   (function walk(dir) {
@@ -138,6 +176,7 @@ function main() {
   console.log('[build] 完成：静态站已生成到 docs/');
   console.log(`  壁纸 ${wallpapers.length} 条，图片 ${imgCount} 张（${bytesText(imgBytes)}）`);
   console.log(`  全站总大小约 ${bytesText(totalBytes)}`);
+  stamped.forEach((s) => console.log('  资源指纹: ' + s));
   console.log('  本地预览: npm run preview  →  http://localhost:4000');
   console.log('  发布: 将 docs/ 随仓库推送 GitHub，Pages 选择 “Deploy from a branch”，目录填 /docs');
 }
