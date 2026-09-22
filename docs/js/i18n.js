@@ -159,7 +159,8 @@
     '艾莲': 'Ellen Joe',
     '朝凪海': 'Umi Asanagi',
     '珂莱塔': 'Carlotta',
-    '帕瓦': 'Power'
+    '帕瓦': 'Power',
+    '艾莉丝': 'Eris'
   };
 
   /* ---------- 标签：中文 → 英文 ---------- */
@@ -177,7 +178,8 @@
     '绝区零': 'Zenless Zone Zero',
     '班上第二可爱的女生': 'The 2nd Cutest Girl in My Class',
     '鸣潮': 'Wuthering Waves',
-    '电锯人': 'Chainsaw Man'
+    '电锯人': 'Chainsaw Man',
+    '无职转生': 'Mushoku Tensei'
   };
 
   const MAINLAND_TZ = /^Asia\/(Shanghai|Chongqing|Urumqi|Harbin|Kashgar|Kashi|Beijing)$/i;

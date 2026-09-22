@@ -99,6 +99,34 @@ function stampAssetUrls() {
   return stamped;
 }
 
+/**
+ * 检查壁纸名称 / 标签是否都有英文翻译
+ *
+ * 英文字典在 public/js/i18n.js 的 TITLE_EN / TAG_EN。
+ * 缺词条时英文界面会退回显示中文原文，构建时提醒站长补齐。
+ */
+function checkTranslations(wallpapers) {
+  const file = path.join(PUBLIC_DIR, 'js', 'i18n.js');
+  if (!fs.existsSync(file)) return [];
+  const src = fs.readFileSync(file, 'utf8');
+
+  const extract = (name) => {
+    const m = new RegExp('const ' + name + ' = \\{([\\s\\S]*?)\\n  \\};').exec(src);
+    if (!m) return {};
+    try { return new Function('return ({' + m[1] + '})')(); } catch (e) { return {}; }
+  };
+  const titleEn = extract('TITLE_EN');
+  const tagEn = extract('TAG_EN');
+
+  const missing = [];
+  wallpapers.forEach((w) => {
+    if (w.title && !w.titleEn && !titleEn[w.title]) missing.push('名称「' + w.title + '」');
+    (w.tags || []).forEach((t) => { if (!tagEn[t]) missing.push('标签「' + t + '」'); });
+  });
+
+  return [...new Set(missing)].map((m) => '英文词典缺少 ' + m + ' —— 英文界面会显示中文原文');
+}
+
 function main() {
   if (!fs.existsSync(DATA_FILE)) {
     console.error('[build] 未找到 data/wallpapers.json，请先本地运行过服务（npm start）以生成数据。');
@@ -160,6 +188,9 @@ function main() {
   };
   used.forEach((rel) => copyInto(rel, '壁纸图片'));
   EXTRA_UPLOADS.forEach((rel) => copyInto(rel, '品牌图'));
+
+  // 4.5) 英文词典覆盖检查（缺词会在英文界面显示中文原文）
+  checkTranslations(wallpapers).forEach((m) => warnings.push(m));
 
   // 5) 写静态数据 data.json + 空 .nojekyll + 自定义域名 CNAME
   const outData = {
