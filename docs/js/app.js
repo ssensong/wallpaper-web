@@ -277,9 +277,10 @@
       try {
         picked = await fetchDataFrom('/api/wallpapers'); // ① 本地后台模式（Node 服务）
       } catch (e) {
-        picked = await fetchDataFrom('data.json'); // ② 纯静态模式：读取随站发布的 data.json
+        picked = await fetchDataFrom('data.json?v=5eeb9cf1'); // ② 纯静态模式：读取随站发布的 data.json
       }
-      staticMode = /\/data\.json$|^data\.json$/.test(picked.url);
+      // data.json 在构建时会被加上 ?v=内容指纹（见 build-static.js），这里用包含判断
+      staticMode = picked.url.indexOf('data.json') !== -1;
       allWallpapers = picked.data.wallpapers || [];
       applyFilter();
       loadedOnce = true;

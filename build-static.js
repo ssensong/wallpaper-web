@@ -55,6 +55,26 @@ function copyDirTree(src, dst, exclude) {
  * CDN 与浏览器都会当成新文件去源站拉取，免去手动「清除缓存」。
  * 只改 docs/ 里的产物，源文件 public/index.html 保持干净。
  */
+/**
+ * 给 docs/js/app.js 里对 data.json 的引用加上内容指纹
+ *
+ * 为什么需要：壁纸数据是 fetch 出来的，浏览器与 CDN 会缓存它，
+ * 导致上传新壁纸并推送后，用户十几分钟内还看到旧列表。
+ * 加上 ?v=内容哈希后，数据一变 URL 就变，立即生效。
+ * 注意：必须在 stampAssetUrls() 之前执行，让 app.js 的新内容参与自身哈希。
+ */
+function stampDataJson() {
+  const appFile = path.join(OUT_DIR, 'js', 'app.js');
+  const dataFile = path.join(OUT_DIR, 'data.json');
+  if (!fs.existsSync(appFile) || !fs.existsSync(dataFile)) return null;
+
+  const h = crypto.createHash('md5').update(fs.readFileSync(dataFile)).digest('hex').slice(0, 8);
+  let js = fs.readFileSync(appFile, 'utf8');
+  js = js.replace(/(fetchDataFrom\('data\.json)(\?v=[0-9a-f]+)?('\))/g, '$1?v=' + h + '$3');
+  fs.writeFileSync(appFile, js, 'utf8');
+  return 'data.json?v=' + h;
+}
+
 function stampAssetUrls() {
   const file = path.join(OUT_DIR, 'index.html');
   if (!fs.existsSync(file)) return [];
@@ -156,6 +176,9 @@ function main() {
     fs.writeFileSync(path.join(OUT_DIR, 'CNAME'), customDomain + '\n', 'utf8');
   }
 
+  // 5.4) 壁纸数据缓存击穿：先给 app.js 里对 data.json 的引用加内容指纹
+  const dataStamp = stampDataJson();
+
   // 5.5) 静态资源加内容指纹：
   //      css/js 引用带上 ?v=内容哈希，避免 Cloudflare / 浏览器缓存
   //      导致推送上线后用户十几分钟内还看到旧样式
@@ -176,6 +199,7 @@ function main() {
   console.log('[build] 完成：静态站已生成到 docs/');
   console.log(`  壁纸 ${wallpapers.length} 条，图片 ${imgCount} 张（${bytesText(imgBytes)}）`);
   console.log(`  全站总大小约 ${bytesText(totalBytes)}`);
+  if (dataStamp) console.log('  数据指纹: ' + dataStamp);
   stamped.forEach((s) => console.log('  资源指纹: ' + s));
   console.log('  本地预览: npm run preview  →  http://localhost:4000');
   console.log('  发布: 将 docs/ 随仓库推送 GitHub，Pages 选择 “Deploy from a branch”，目录填 /docs');
