@@ -53,6 +53,34 @@ code { background: var(--card); padding: 1px 7px; border-radius: 6px; font-size:
 .input::placeholder { color: #5b5b64; }
 .input:focus { border-color: #8e8e98; box-shadow: 0 0 0 3px rgba(242, 242, 243, 0.08); }
 
+/* 日期选择器：iOS / 安卓的原生控件会忽略上面的宽高，
+   导致它比其它输入框更宽更高、文字顶到边框。这里关掉原生外观并强制撑满。
+   再用 flex 让内部的日期文本垂直居中（WebKit 上需要这样处理）。 */
+.input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 52px;
+  min-height: 52px;
+  padding: 0 14px;
+  display: flex;            /* 关键：WebKit 下让日期文本垂直居中 */
+  align-items: center;
+  text-align: left;
+  line-height: normal;
+}
+/* 内部日期文本：去掉自带内边距/居中，与其它输入框一致靠左 */
+.input[type="date"]::-webkit-datetime-edit,
+.input[type="date"]::-webkit-date-and-time-value,
+.input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  line-height: normal;
+}
+.input[type="date"]::-webkit-calendar-picker-indicator { opacity: .55; }
+
 .file-input:focus + .file-pick { border-color: #8e8e98; }
 .upload-note { margin-left: auto; font-size: 12px; color: #5b5b64; }
 
@@ -210,7 +238,8 @@ code { background: var(--card); padding: 1px 7px; border-radius: 6px; font-size:
 .link-home:hover { color: var(--text); border-color: #3d3d47; }
 .link-home.danger { color: #d3d3d9; }
 
-.admin-main { max-width: 860px; margin: 0 auto; padding: 20px 16px 40px; }
+/* 底部多留一段：避免「保存壁纸」按钮被 Safari 底部工具栏遮住 */
+.admin-main { max-width: 860px; margin: 0 auto; padding: 20px 16px calc(96px + env(safe-area-inset-bottom)); }
 
 .card-block {
   background: var(--bg-soft);

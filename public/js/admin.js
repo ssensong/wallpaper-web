@@ -142,7 +142,7 @@
       const info = document.createElement('div');
       info.className = 'info';
       const h3 = document.createElement('h3');
-      h3.textContent = w.title;
+      h3.textContent = w.titleEn ? `${w.title} / ${w.titleEn}` : w.title;
       const meta = document.createElement('div');
       meta.className = 'meta';
       meta.textContent = `${w.date || ''}  ·  ${(w.tags || []).join(' / ') || '无标签'}  ·  ${w.panUrl || '未填网盘链接'}`;
@@ -203,6 +203,7 @@
     resetForm();
     $('#fId').value = w.id;
     $('#fTitle').value = w.title || '';
+    $('#fTitleEn').value = w.titleEn || '';
     $('#fTags').value = (w.tags || []).join(', ');
     $('#fDate').value = w.date || todayStr();
     $('#fPan').value = w.panUrl || '';

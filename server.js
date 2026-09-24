@@ -197,11 +197,12 @@ app.get('/api/admin/wallpapers', requireAdmin, (req, res) => {
 
 /**
  * POST /api/admin/wallpapers  新增壁纸（multipart/form-data）
- * 字段：title 名称 | tags 标签(逗号分隔) | date 日期 | panUrl 网盘链接 | image 图片文件(可选但建议)
+ * 字段：title 名称 | titleEn 英文名(选填) | tags 标签(逗号分隔) | date 日期 | panUrl 网盘链接 | image 图片文件
  */
 app.post('/api/admin/wallpapers', requireAdmin, upload.single('image'), async (req, res, next) => {
   try {
     const title = String(req.body.title || '').trim();
+    const titleEn = String(req.body.titleEn || '').trim(); // 英文名（选填）
     if (!title) {
       return res.status(400).json({ error: '壁纸名称不能为空' });
     }
@@ -223,6 +224,8 @@ app.post('/api/admin/wallpapers', requireAdmin, upload.single('image'), async (r
       panUrl: String(req.body.panUrl || '').trim(),
       image
     };
+    // 英文名：只在填写时写入数据（英文界面会优先使用它，不填则由内置词典翻译）
+    if (titleEn) item.titleEn = titleEn;
     wallpapers.push(item);
     await saveWallpapers(wallpapers);
     res.json({ ok: true, wallpaper: item });
@@ -244,6 +247,7 @@ app.put('/api/admin/wallpapers/:id', requireAdmin, upload.single('image'), async
     }
 
     const title = String(req.body.title || '').trim();
+    const titleEn = String(req.body.titleEn || '').trim(); // 英文名（选填）
     if (!title) {
       return res.status(400).json({ error: '壁纸名称不能为空' });
     }
@@ -267,6 +271,9 @@ app.put('/api/admin/wallpapers/:id', requireAdmin, upload.single('image'), async
     old.tags = parseTags(req.body.tags !== undefined ? req.body.tags : old.tags.join(','));
     old.date = String(req.body.date || old.date || todayStr());
     old.panUrl = String(req.body.panUrl !== undefined ? req.body.panUrl : old.panUrl).trim();
+    // 英文名：填了就更新，清空则删除（回到内置词典翻译）
+    if (titleEn) old.titleEn = titleEn;
+    else delete old.titleEn;
 
     wallpapers[idx] = old;
     await saveWallpapers(wallpapers);
