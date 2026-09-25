@@ -1,7 +1,27 @@
 {
-  "generatedAt": "2026-09-24T15:41:07.425Z",
-  "count": 38,
+  "generatedAt": "2026-09-25T08:34:05.106Z",
+  "count": 40,
   "wallpapers": [
+    {
+      "id": 46,
+      "title": "噬魂师",
+      "tags": [
+        "噬魂师"
+      ],
+      "date": "2026-09-26",
+      "panUrl": "https://pan.baidu.com/s/10904Zl0ozZStlM9wByqOzQ?pwd=1111",
+      "image": "uploads/mugp97ht-2b7230e9.jpg"
+    },
+    {
+      "id": 45,
+      "title": "玛奇玛",
+      "tags": [
+        "电锯人"
+      ],
+      "date": "2026-09-25",
+      "panUrl": "https://pan.baidu.com/s/1bK2Nc6KLkDVmRmheM3zmow?pwd=1111",
+      "image": "uploads/mugp813b-b9c76a98.jpg"
+    },
     {
       "id": 44,
       "title": "艾莉丝",

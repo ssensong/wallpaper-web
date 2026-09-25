@@ -160,7 +160,9 @@
     '朝凪海': 'Umi Asanagi',
     '珂莱塔': 'Carlotta',
     '帕瓦': 'Power',
-    '艾莉丝': 'Eris'
+    '艾莉丝': 'Eris',
+    '玛奇玛': 'Makima',
+    '噬魂师': 'Soul Eater'
   };
 
   /* ---------- 标签：中文 → 英文 ---------- */
@@ -179,7 +181,8 @@
     '班上第二可爱的女生': 'The 2nd Cutest Girl in My Class',
     '鸣潮': 'Wuthering Waves',
     '电锯人': 'Chainsaw Man',
-    '无职转生': 'Mushoku Tensei'
+    '无职转生': 'Mushoku Tensei',
+    '噬魂师': 'Soul Eater'
   };
 
   const MAINLAND_TZ = /^Asia\/(Shanghai|Chongqing|Urumqi|Harbin|Kashgar|Kashi|Beijing)$/i;

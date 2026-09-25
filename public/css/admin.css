@@ -84,6 +84,25 @@ code { background: var(--card); padding: 1px 7px; border-radius: 6px; font-size:
 .file-input:focus + .file-pick { border-color: #8e8e98; }
 .upload-note { margin-left: auto; font-size: 12px; color: #5b5b64; }
 
+/* 折叠式小按钮（英文名入口）：与输入框外观区分开，降低误触 */
+.mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--text-sub);
+  background: transparent;
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s, transform .15s;
+}
+.mini-btn:hover { color: var(--text); border-color: #8e8e98; background: rgba(255, 255, 255, .04); }
+.mini-btn:active { transform: scale(.98); }
+#titleEnWrap { margin-top: 10px; }
+#titleEnWrap .upload-note { display: block; margin: 6px 0 0; }
+
 /* 样式化上传按钮（真正的 input 隐藏但可点，移动端友好） */
 .file-input {
   position: absolute;

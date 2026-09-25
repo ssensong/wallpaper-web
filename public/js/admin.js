@@ -185,11 +185,31 @@
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
   }
 
+  /* =========================================================
+     英文名（选填）：默认收起成小按钮，点开才展开输入框
+     目的：避免填写「壁纸名称 / 标签」时误触到它导致光标跑掉
+     =======================================================*/
+  const titleEnWrap = $('#titleEnWrap');
+  const titleEnBtn = $('#toggleTitleEn');
+  const titleEnBtnText = $('#titleEnBtnText');
+  function setTitleEnOpen(open) {
+    titleEnWrap.hidden = !open;
+    titleEnBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    titleEnBtnText.textContent = (open ? '－ ' : '＋ ') + '英文名（选填）';
+  }
+  titleEnBtn.addEventListener('click', () => {
+    const willOpen = titleEnWrap.hidden;
+    setTitleEnOpen(willOpen);
+    if (willOpen) $('#fTitleEn').focus();
+  });
+  setTitleEnOpen(false);
+
   /** 清空表单，回到“新增”状态 */
   function resetForm() {
     $('#wallpaperForm').reset();
     $('#fId').value = '';
     $('#fDate').value = todayStr();
+    setTitleEnOpen(false); // 收起英文名输入框
     $('#editorTitle').textContent = '＋ 新增壁纸';
     $('#resetFormBtn').hidden = true;
     $('#uploadReq').hidden = true;
@@ -204,6 +224,7 @@
     $('#fId').value = w.id;
     $('#fTitle').value = w.title || '';
     $('#fTitleEn').value = w.titleEn || '';
+    setTitleEnOpen(Boolean(w.titleEn)); // 已有英文名时自动展开，方便查看/修改
     $('#fTags').value = (w.tags || []).join(', ');
     $('#fDate').value = w.date || todayStr();
     $('#fPan').value = w.panUrl || '';
