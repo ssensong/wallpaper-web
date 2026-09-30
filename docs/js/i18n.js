@@ -163,7 +163,9 @@
     '艾莉丝': 'Eris',
     '玛奇玛': 'Makima',
     '噬魂师': 'Soul Eater',
-    '玛丽': 'Marie'
+    '玛丽': 'Marie',
+    '伊芙琳': 'Evelyn Chevalier',
+    '南宫羽': 'Nangong Yu'
   };
 
   /* ---------- 标签：中文 → 英文 ---------- */
