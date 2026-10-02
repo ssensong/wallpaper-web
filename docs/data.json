@@ -1,7 +1,27 @@
 {
-  "generatedAt": "2026-09-30T17:05:06.944Z",
-  "count": 44,
+  "generatedAt": "2026-10-02T09:40:14.379Z",
+  "count": 46,
   "wallpapers": [
+    {
+      "id": 52,
+      "title": "早川秋",
+      "tags": [
+        "电锯人"
+      ],
+      "date": "2026-10-03",
+      "panUrl": "https://pan.baidu.com/s/1qG-rb3sLz2I4Nsm-miGUaw?pwd=1111",
+      "image": "uploads/muqr7k7d-7218e277.jpg"
+    },
+    {
+      "id": 51,
+      "title": "椎名真昼",
+      "tags": [
+        "邻家天使"
+      ],
+      "date": "2026-10-02",
+      "panUrl": "https://pan.baidu.com/s/1WFuAWSQGB5gnkpuH6Y430w?pwd=1111",
+      "image": "uploads/muqr07na-f6bca184.jpg"
+    },
     {
       "id": 50,
       "title": "南宫羽",

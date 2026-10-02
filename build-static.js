@@ -127,6 +127,105 @@ function checkTranslations(wallpapers) {
   return [...new Set(missing)].map((m) => '英文词典缺少 ' + m + ' —— 英文界面会显示中文原文');
 }
 
+/**
+ * SEO 产物：sitemap.xml + 页面内的静态壁纸清单
+ *
+ * 为什么需要：
+ *   1) 壁纸列表是 JS 渲染的，不执行 JS 的爬虫（百度、部分社交平台）抓到的页面是空的。
+ *      这里把壁纸清单以 <noscript> 形式写进 HTML：无 JS 时给爬虫/用户看，
+ *      正常浏览时 <noscript> 不显示、也不会下载其中的图片，不影响性能。
+ *   2) sitemap.xml 告诉搜索引擎有哪些图片可以收录（含图片 sitemap 扩展）。
+ */
+function buildSeo(wallpapers, siteUrl) {
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  const abs = (u) => {
+    const s = String(u || '');
+    if (!s) return '';
+    return /^https?:\/\//.test(s) ? s : siteUrl + '/' + s.replace(/^\/+/, '');
+  };
+
+  const withImg = wallpapers.filter((w) => w.image);
+
+  // ① sitemap.xml（首页 + 全部图片）
+  const imageTags = withImg.map((w) => [
+    '    <image:image>',
+    '      <image:loc>' + esc(abs(w.image)) + '</image:loc>',
+    '      <image:title>' + esc(w.title) + '</image:title>',
+    '    </image:image>'
+  ].join('\n')).join('\n');
+
+  const sitemap = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+    '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
+    '  <url>',
+    '    <loc>' + esc(siteUrl) + '/</loc>',
+    '    <lastmod>' + new Date().toISOString().slice(0, 10) + '</lastmod>',
+    '    <changefreq>daily</changefreq>',
+    '    <priority>1.0</priority>',
+    imageTags,
+    '  </url>',
+    '</urlset>',
+    ''
+  ].join('\n');
+  fs.writeFileSync(path.join(OUT_DIR, 'sitemap.xml'), sitemap, 'utf8');
+
+  // ② 页面内静态内容：无 JS 时的壁纸清单 + 图片结构化数据
+  const htmlFile = path.join(OUT_DIR, 'index.html');
+  if (!fs.existsSync(htmlFile)) return 'sitemap.xml';
+  let html = fs.readFileSync(htmlFile, 'utf8');
+
+  const items = withImg.map((w) => {
+    const tags = (w.tags || []).join(' / ');
+    const alt = [w.title, tags].filter(Boolean).join(' - ');
+    return '      <li style="margin:10px 0;list-style:none">'
+      + '<img src="' + esc(w.image) + '" alt="' + esc(alt) + '" loading="lazy" '
+      + 'style="width:64px;height:auto;border-radius:8px;vertical-align:middle;margin-right:10px" />'
+      + '<b>' + esc(w.title) + '</b>'
+      + (tags ? ' <span style="opacity:.7">' + esc(tags) + '</span>' : '')
+      + '</li>';
+  }).join('\n');
+
+  const noscript = [
+    '  <!-- 以下内容由构建脚本自动生成：无 JS 的爬虫（如百度）可读到全部壁纸；'
+      + '正常浏览时 <noscript> 不显示，也不会加载其中的图片 -->',
+    '  <noscript>',
+    '    <section style="max-width:920px;margin:24px auto;padding:0 16px">',
+    '      <h2 style="font-size:16px;margin:12px 0">壁纸列表 · Wallpapers</h2>',
+    '      <ul style="padding:0">',
+    items,
+    '      </ul>',
+    '    </section>',
+    '  </noscript>'
+  ].join('\n');
+
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: '岚木壁纸 · 原创 iOS 交互壁纸',
+    numberOfItems: withImg.length,
+    itemListElement: withImg.slice(0, 100).map((w, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'ImageObject',
+        contentUrl: abs(w.image),
+        name: w.title,
+        ...(w.tags && w.tags.length ? { keywords: w.tags.join(', ') } : {})
+      }
+    }))
+  };
+  const ldScript = '  <script type="application/ld+json">\n'
+    + JSON.stringify(ld, null, 2).split('\n').join('\n  ')
+    + '\n  </script>';
+
+  html = html.replace('</body>', noscript + '\n' + ldScript + '\n</body>');
+  fs.writeFileSync(htmlFile, html, 'utf8');
+  return 'sitemap.xml + noscript 壁纸清单 + 图片结构化数据';
+}
+
 function main() {
   if (!fs.existsSync(DATA_FILE)) {
     console.error('[build] 未找到 data/wallpapers.json，请先本地运行过服务（npm start）以生成数据。');
@@ -207,6 +306,9 @@ function main() {
     fs.writeFileSync(path.join(OUT_DIR, 'CNAME'), customDomain + '\n', 'utf8');
   }
 
+  // 5.2) SEO：sitemap.xml + 页面静态壁纸清单（详见 buildSeo 注释）
+  const seoInfo = buildSeo(wallpapers, 'https://' + customDomain);
+
   // 5.4) 壁纸数据缓存击穿：先给 app.js 里对 data.json 的引用加内容指纹
   const dataStamp = stampDataJson();
 
@@ -230,6 +332,7 @@ function main() {
   console.log('[build] 完成：静态站已生成到 docs/');
   console.log(`  壁纸 ${wallpapers.length} 条，图片 ${imgCount} 张（${bytesText(imgBytes)}）`);
   console.log(`  全站总大小约 ${bytesText(totalBytes)}`);
+  if (seoInfo) console.log('  SEO 产物: ' + seoInfo);
   if (dataStamp) console.log('  数据指纹: ' + dataStamp);
   stamped.forEach((s) => console.log('  资源指纹: ' + s));
   console.log('  本地预览: npm run preview  →  http://localhost:4000');

@@ -165,7 +165,8 @@
     '噬魂师': 'Soul Eater',
     '玛丽': 'Marie',
     '伊芙琳': 'Evelyn Chevalier',
-    '南宫羽': 'Nangong Yu'
+    '南宫羽': 'Nangong Yu',
+    '早川秋': 'Aki Hayakawa'
   };
 
   /* ---------- 标签：中文 → 英文 ---------- */
