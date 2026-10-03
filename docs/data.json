@@ -1,7 +1,17 @@
 {
-  "generatedAt": "2026-10-02T09:40:14.379Z",
-  "count": 46,
+  "generatedAt": "2026-10-03T13:55:19.135Z",
+  "count": 47,
   "wallpapers": [
+    {
+      "id": 53,
+      "title": "早川秋",
+      "tags": [
+        "电锯人"
+      ],
+      "date": "2026-10-04",
+      "panUrl": "https://pan.baidu.com/s/1W9V65hKTYR0R3cIEtpY7bA?pwd=1111",
+      "image": "uploads/musger06-0df042fe.jpg"
+    },
     {
       "id": 52,
       "title": "早川秋",
