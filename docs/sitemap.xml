@@ -3,9 +3,13 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://ranmoku.top/</loc>
-    <lastmod>2026-10-03</lastmod>
+    <lastmod>2026-10-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://ranmoku.top/uploads/mv4rzm7v-a6af2b75.jpg</image:loc>
+      <image:title>波奇酱</image:title>
+    </image:image>
     <image:image>
       <image:loc>https://ranmoku.top/uploads/musger06-0df042fe.jpg</image:loc>
       <image:title>早川秋</image:title>
