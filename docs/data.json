@@ -1,7 +1,25 @@
 {
-  "generatedAt": "2026-10-12T04:53:19.445Z",
-  "count": 48,
+  "generatedAt": "2026-10-16T14:55:50.936Z",
+  "count": 50,
   "wallpapers": [
+    {
+      "id": 56,
+      "title": "Hide",
+      "tags": [],
+      "date": "2026-10-18",
+      "panUrl": "https://pan.baidu.com/s/1OSjLPdDrGjUk2N0gfiJDcw?pwd=1111",
+      "image": "uploads/mvb39yto-db83df83.jpg"
+    },
+    {
+      "id": 55,
+      "title": "2B",
+      "tags": [
+        "尼尔：机械纪元"
+      ],
+      "date": "2026-10-17",
+      "panUrl": "https://pan.baidu.com/s/1Zu_2ckYKjnTW1i693nv2Dw?pwd=1111",
+      "image": "uploads/mvb38ksx-52b3d35e.jpg"
+    },
     {
       "id": 54,
       "title": "波奇酱",

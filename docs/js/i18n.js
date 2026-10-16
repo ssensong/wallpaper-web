@@ -166,7 +166,9 @@
     '玛丽': 'Marie',
     '伊芙琳': 'Evelyn Chevalier',
     '南宫羽': 'Nangong Yu',
-    '早川秋': 'Aki Hayakawa'
+    '早川秋': 'Aki Hayakawa',
+    '2B': '2B',
+    'Hide': 'Hide'
   };
 
   /* ---------- 标签：中文 → 英文 ---------- */
@@ -186,7 +188,8 @@
     '鸣潮': 'Wuthering Waves',
     '电锯人': 'Chainsaw Man',
     '无职转生': 'Mushoku Tensei',
-    '噬魂师': 'Soul Eater'
+    '噬魂师': 'Soul Eater',
+    '尼尔：机械纪元': 'NieR:Automata'
   };
 
   const MAINLAND_TZ = /^Asia\/(Shanghai|Chongqing|Urumqi|Harbin|Kashgar|Kashi|Beijing)$/i;
