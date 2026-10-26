@@ -73,10 +73,10 @@
       'tut.a3': 'A：可稍后再试或刷新页面；如果长期失效可联系站长更新链接。',
 
       'inapp.hint': '点这里',
-      'inapp.title': '请用 Safari 打开',
+      'inapp.title': '请在浏览器中打开',
       'inapp.desc': '当前应用内置浏览器无法正常下载壁纸。',
       'inapp.step1': '点击右上角的「•••」',
-      'inapp.step2': '选择「在 Safari 中打开」',
+      'inapp.step2': '选择「在浏览器中打开」',
       'inapp.continue': '继续在应用内浏览'
     },
     en: {
@@ -130,10 +130,10 @@
       'tut.a3': 'A: Try again later or refresh the page. If it stays broken, contact the site owner to update the link.',
 
       'inapp.hint': 'Tap here',
-      'inapp.title': 'Open in Safari',
+      'inapp.title': 'Open in browser',
       'inapp.desc': 'The built-in browser cannot download wallpapers properly.',
       'inapp.step1': 'Tap the ••• menu at the top right',
-      'inapp.step2': 'Choose “Open in Safari”',
+      'inapp.step2': 'Choose “Open in browser”',
       'inapp.continue': 'Continue anyway'
     }
   };
