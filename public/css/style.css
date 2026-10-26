@@ -540,6 +540,58 @@ html[lang="en"] .brand-sub {
 .btn-download:active { transform: scale(.98); }
 .btn-download:hover { opacity: .9; }
 
+/* 弹窗操作区：主按钮（获取壁纸文件）+ 次按钮（复制链接）并排等高 */
+.modal-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+/* 并排后主按钮不再占满整行（长度缩短），高度与右侧按钮对齐 */
+.modal-actions .btn-download {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+/* 复制链接：浅灰底 + 深色字，与白色主按钮一眼区分 */
+.btn-copy {
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 15px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #23232a;
+  background: #d6d6dd;
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s, transform .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-copy:hover { background: #e3e3e9; }
+.btn-copy:active { transform: scale(.98); }
+/* 壁纸下载教程：次级按钮，描边样式 */
+.btn-guide {
+  display: block;
+  width: 100%;
+  height: 42px;
+  margin-top: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-sub);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-guide:hover { color: var(--text); border-color: #4b4b56; background: rgba(255, 255, 255, .05); }
+.btn-guide:active { transform: scale(.99); }
+
 /* =========================================================
    使用教程页
    =======================================================*/
@@ -627,9 +679,268 @@ html[lang="en"] .brand-sub {
 .steps .tut-link:hover { color: var(--text); border-color: #3d3d47; background: var(--card-hover); }
 .steps .hint { margin-top: 8px; font-size: 12px; color: var(--muted); }
 
+/* 步骤 2：并排的两个导入工具按钮 + 下方系统版本小字注释 */
+.tut-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  margin-top: 9px;
+}
+.tut-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tut-tool .tut-link { margin-top: 0; }
+/* 版本注释：去掉边框，只让文字高亮，居中显示在按钮正下方 */
+.tut-tool-note {
+  margin-top: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .3px;
+  text-align: center;
+  color: var(--accent);
+}
+
 .qa { display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
 .qa-q { color: var(--text-sub); font-weight: 600; margin-top: 6px; }
 .qa-a { color: var(--muted); }
+
+/* =========================================================
+   壁纸下载教程（独立界面）
+   从壁纸详情里的 Download guide 进入，与「使用教程」页互不相干
+   竖向+横向滑动的手机截图步骤 + 底部圆点 + 全屏大图查看
+   =======================================================*/
+.dl-guide {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(900px 400px at 80% -10%, rgba(255, 255, 255, .05), transparent 65%),
+    var(--bg);
+  animation: fadeIn .2s ease;
+}
+.dl-guide[hidden] { display: none !important; }
+/* 该界面里要允许「左右滑动看步骤」，临时放开 html 的 touch-action: pan-y */
+html.dl-lock { touch-action: pan-x pan-y; }
+html.dl-lock,
+html.dl-lock body { overflow: hidden; }
+html.guide-lock { touch-action: pan-x pan-y; }
+
+.dl-guide-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.dl-guide-back {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  padding: 0;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dl-guide-back svg { width: 18px; height: 18px; }
+.dl-guide-back:active { transform: scale(.94); }
+.dl-guide-bar h2 { font-size: 16.5px; font-weight: 700; letter-spacing: .2px; }
+
+.dl-guide-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 0 calc(20px + env(safe-area-inset-bottom));
+}
+
+.guide-hint {
+  padding: 0 20px;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* 滑动轨道：卡片左右出血，滑动到边缘有吸附 */
+.guide-track {
+  touch-action: pan-x pan-y;
+  display: flex;
+  gap: 12px;
+  padding: 2px 20px 12px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 20px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.guide-track::-webkit-scrollbar { display: none; }
+
+.guide-step {
+  flex: 0 0 auto;
+  width: 208px;
+  margin: 0;
+  scroll-snap-align: start;
+}
+.guide-shot {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
+  padding: 0;
+  background: #0b0b0d;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .2s, transform .2s;
+}
+.guide-shot img {
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: top center;
+}
+.guide-shot:active { transform: scale(.985); }
+/* 右下角放大镜角标 */
+.guide-zoom {
+  position: absolute; right: 8px; bottom: 8px;
+  width: 26px; height: 26px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  color: #f2f2f3;
+  background: rgba(10, 10, 12, .62);
+  border: 1px solid rgba(255, 255, 255, .16);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.guide-zoom svg { width: 14px; height: 14px; }
+
+.guide-step figcaption { padding: 10px 2px 0; }
+.guide-step-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.guide-num {
+  flex: 0 0 auto;
+  width: 18px; height: 18px;
+  margin-top: 1px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+.guide-step p { margin-top: 5px; color: var(--muted); font-size: 12.5px; line-height: 1.65; }
+
+/* 底部步骤圆点 */
+.guide-dots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 2px 20px 0;
+}
+.guide-dot {
+  width: 6px; height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #3a3a44;
+  cursor: pointer;
+  transition: width .2s, background .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.guide-dot.active { width: 18px; background: var(--accent); }
+
+/* ---------- 全屏大图查看器 ---------- */
+.guide-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  background: rgba(4, 4, 6, .96);
+  padding: calc(10px + env(safe-area-inset-top)) 0 calc(14px + env(safe-area-inset-bottom));
+  animation: fadeIn .18s ease;
+}
+.guide-viewer[hidden] { display: none !important; }
+.guide-viewer-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14px 8px;
+}
+.guide-counter { font-size: 13px; color: var(--text-sub); letter-spacing: .6px; }
+.guide-viewer-btn {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  color: var(--text);
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.guide-viewer-btn svg { width: 17px; height: 17px; }
+.guide-viewer-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 8px;
+}
+.guide-viewer-img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+.guide-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px; height: 60px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  color: #f2f2f3;
+  background: rgba(18, 18, 22, .72);
+  border: 1px solid rgba(255, 255, 255, .12);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.guide-nav svg { width: 20px; height: 20px; }
+.guide-nav-prev { left: 2px; }
+.guide-nav-next { right: 2px; }
+.guide-nav[disabled] { opacity: .25; pointer-events: none; }
+.guide-viewer-cap {
+  padding: 10px 18px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+/* 查看大图时锁住页面滚动 */
+html.guide-lock,
+html.guide-lock body { overflow: hidden; }
+
+@media (min-width: 640px) {
+  .dl-guide-bar,
+  .dl-guide-body { width: 100%; max-width: 900px; margin: 0 auto; }
+  .dl-guide-bar h2 { font-size: 18px; }
+  .guide-step { width: 240px; }
+  .guide-nav { width: 42px; height: 72px; }
+}
 
 /* =========================================================
    悬浮导航栏
@@ -810,8 +1121,9 @@ html.inapp-lock body { overflow: hidden; }
 /* 指向右上角「•••」的箭头：三角尖正好落在网页右上角 */
 .inapp-arrow {
   position: fixed;
-  top: 0;
-  right: 0;
+  /* 箭头整体往画面中心收一点：不再贴死在屏幕边缘 */
+  top: 14px;
+  right: 34px;
   z-index: 2;
   width: 112px;
   height: 112px;

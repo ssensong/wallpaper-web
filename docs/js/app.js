@@ -277,7 +277,7 @@
       try {
         picked = await fetchDataFrom('/api/wallpapers'); // ① 本地后台模式（Node 服务）
       } catch (e) {
-        picked = await fetchDataFrom('data.json?v=f900930a'); // ② 纯静态模式：读取随站发布的 data.json
+        picked = await fetchDataFrom('data.json?v=d00c3555'); // ② 纯静态模式：读取随站发布的 data.json
       }
       // data.json 在构建时会被加上 ?v=内容指纹（见 build-static.js），这里用包含判断
       staticMode = picked.url.indexOf('data.json') !== -1;
@@ -425,7 +425,9 @@
     if (e.target === modalBackdrop) closeModal();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modalBackdrop.hidden) closeModal();
+    // 下载教程界面盖在弹窗之上时，Esc 只退出教程，不连带关掉壁纸详情
+    const guideOpen = dlGuide && !dlGuide.hidden;
+    if (e.key === 'Escape' && !modalBackdrop.hidden && !guideOpen) closeModal();
   });
 
   // 下载按钮防呆：未填写网盘链接时给出提示，绝不跳回当前页
@@ -435,6 +437,71 @@
       showToast(t('modal.noLink'));
     }
   });
+
+  /* ---------- 复制壁纸链接 ----------
+     https / localhost 用 Clipboard API；
+     局域网 http://（不安全上下文）API 不可用，退回 execCommand 方案。 */
+  function copyToClipboard(text) {
+    const s = String(text || '');
+    const domCopy = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = s;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, s.length);
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (err) {
+        return false;
+      }
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(s).then(() => true).catch(domCopy);
+    }
+    return Promise.resolve(domCopy());
+  }
+
+  const modalCopy = $('#modalCopy');
+  if (modalCopy) {
+    modalCopy.addEventListener('click', () => {
+      const link = currentWallpaper && currentWallpaper.panUrl ? currentWallpaper.panUrl : '';
+      if (!link) {
+        showToast(t('modal.noLink'));
+        return;
+      }
+      copyToClipboard(link).then((ok) => {
+        showToast(ok ? t('modal.copied') : t('modal.copyFail'));
+      });
+    });
+  }
+
+  /* ---------- 壁纸下载教程：独立界面（与「教程」页互不相干） ---------- */
+  const dlGuide = $('#downloadGuide');
+  const dlGuideBody = dlGuide ? dlGuide.querySelector('.dl-guide-body') : null;
+
+  // 不关闭壁纸详情弹窗：教程界面盖在它上面，退出后原样回到这张壁纸
+  function openDownloadGuide() {
+    if (!dlGuide) return;
+    dlGuide.hidden = false;
+    document.documentElement.classList.add('dl-lock');
+    if (dlGuideBody) dlGuideBody.scrollTop = 0;
+  }
+
+  function closeDownloadGuide() {
+    if (!dlGuide || dlGuide.hidden) return;
+    dlGuide.hidden = true;
+    document.documentElement.classList.remove('dl-lock');
+  }
+
+  const modalGuide = $('#modalGuide');
+  if (modalGuide) modalGuide.addEventListener('click', openDownloadGuide);
+
+  const dlGuideBack = $('#dlGuideBack');
+  if (dlGuideBack) dlGuideBack.addEventListener('click', closeDownloadGuide);
 
   /* ---------- 语言切换：重绘已渲染内容（静态文案由 i18n.js 负责） ---------- */
   document.addEventListener('langchange', () => {
@@ -522,6 +589,149 @@
     // 点遮罩也可关闭，避免用户被挡住无处可去
     tip.addEventListener('click', (e) => {
       if (e.target === tip || (e.target.classList && e.target.classList.contains('inapp-mask'))) close();
+    });
+  })();
+
+  /* ---------- 壁纸下载流程：图片步骤轮播 + 全屏大图查看 ---------- */
+  (function initGuide() {
+    const track = $('#guideTrack');
+    const viewer = $('#guideViewer');
+    if (!track || !viewer) return;
+
+    const steps = Array.prototype.slice.call(track.querySelectorAll('.guide-step'));
+    if (!steps.length) return;
+
+    const imgs = steps.map((el) => el.querySelector('.guide-shot img'));
+    const titleEls = steps.map((el) => el.querySelector('.guide-step-title [data-i18n]') || el.querySelector('.guide-step-title'));
+    const dotsBox = $('#guideDots');
+    const viewerImg = $('#guideViewerImg');
+    const viewerCap = $('#guideViewerCap');
+    const counter = $('#guideCounter');
+    const prevBtn = $('#guidePrev');
+    const nextBtn = $('#guideNext');
+    const closeBtn = $('#guideViewerClose');
+
+    const padLeft = () => parseFloat(getComputedStyle(track).paddingLeft) || 0;
+    const stepLeft = (i) => Math.max(0, steps[i].offsetLeft - padLeft());
+    const stepTitle = (i) => (titleEls[i] ? titleEls[i].textContent.trim() : '');
+
+    /* ---------- 底部圆点 ---------- */
+    const dots = steps.map((el, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'guide-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', String(i + 1));
+      dot.addEventListener('click', () => {
+        try { track.scrollTo({ left: stepLeft(i), behavior: 'smooth' }); } catch (e) { track.scrollLeft = stepLeft(i); }
+      });
+      if (dotsBox) dotsBox.appendChild(dot);
+      return dot;
+    });
+
+    // 滑动时按「离左边缘最近的卡片」点亮圆点
+    function currentIndex() {
+      const base = padLeft();
+      let best = 0;
+      let bestGap = Infinity;
+      steps.forEach((el, i) => {
+        const gap = Math.abs(el.offsetLeft - base - track.scrollLeft);
+        if (gap < bestGap) { bestGap = gap; best = i; }
+      });
+      return best;
+    }
+    let ticking = false;
+    track.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const i = currentIndex();
+        dots.forEach((dot, k) => dot.classList.toggle('active', k === i));
+      });
+    }, { passive: true });
+
+    /* ---------- 大图查看器 ---------- */
+    let index = 0;
+
+    function render() {
+      const src = imgs[index] ? imgs[index].getAttribute('src') : '';
+      if (viewerImg) {
+        viewerImg.setAttribute('src', src);
+        viewerImg.setAttribute('alt', stepTitle(index));
+      }
+      if (viewerCap) viewerCap.textContent = stepTitle(index);
+      if (counter) counter.textContent = (index + 1) + ' / ' + steps.length;
+      if (prevBtn) prevBtn.disabled = index === 0;
+      if (nextBtn) nextBtn.disabled = index === steps.length - 1;
+    }
+
+    function open(i) {
+      index = Math.max(0, Math.min(steps.length - 1, i));
+      render();
+      viewer.hidden = false;
+      document.documentElement.classList.add('guide-lock');
+    }
+
+    function close() {
+      if (viewer.hidden) return;
+      viewer.hidden = true;
+      document.documentElement.classList.remove('guide-lock');
+      if (viewerImg) viewerImg.removeAttribute('src');
+    }
+
+    function go(delta) {
+      const next = index + delta;
+      if (next < 0 || next >= steps.length) return;
+      index = next;
+      render();
+      // 关掉大图后轮播停在当前步骤
+      try { track.scrollTo({ left: stepLeft(index), behavior: 'smooth' }); } catch (e) { track.scrollLeft = stepLeft(index); }
+    }
+
+    steps.forEach((el, i) => {
+      const shot = el.querySelector('.guide-shot');
+      if (shot) shot.addEventListener('click', () => open(i));
+    });
+
+    if (prevBtn) prevBtn.addEventListener('click', () => go(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => go(1));
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    // 点击空白区域关闭（图片本身不关闭）
+    viewer.addEventListener('click', (e) => {
+      if (e.target === viewer || e.target.classList.contains('guide-viewer-stage')) close();
+    });
+
+    // 键盘：左右切换 / Esc 关闭
+    document.addEventListener('keydown', (e) => {
+      if (viewer.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') go(-1);
+      else if (e.key === 'ArrowRight') go(1);
+    });
+
+    // 手势：左右滑动切换
+    let startX = 0;
+    let startY = 0;
+    viewer.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    viewer.addEventListener('touchend', (e) => {
+      if (!e.changedTouches.length) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1);
+    }, { passive: true });
+
+    // 中英切换后刷新大图文案
+    document.addEventListener('langchange', () => {
+      if (!viewer.hidden) render();
+    });
+
+    // Esc 关闭独立教程界面（大图查看器打开时优先交给它处理）
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && viewer.hidden) closeDownloadGuide();
     });
   })();
 
