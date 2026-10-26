@@ -277,7 +277,7 @@
       try {
         picked = await fetchDataFrom('/api/wallpapers'); // ① 本地后台模式（Node 服务）
       } catch (e) {
-        picked = await fetchDataFrom('data.json?v=b860ea95'); // ② 纯静态模式：读取随站发布的 data.json
+        picked = await fetchDataFrom('data.json?v=ad33beca'); // ② 纯静态模式：读取随站发布的 data.json
       }
       // data.json 在构建时会被加上 ?v=内容指纹（见 build-static.js），这里用包含判断
       staticMode = picked.url.indexOf('data.json') !== -1;
@@ -489,6 +489,41 @@
     const el = e.target;
     if (el && el.tagName === 'IMG') e.preventDefault();
   });
+
+  /* ---------- 应用内浏览器提示（TikTok / 抖音等 WebView） ----------
+     TikTok 内置浏览器不支持下载、长按保存，也没法用 JS 直接跳转 Safari，
+     所以只能引导用户点右上角「•••」→「Open in Safari」。
+     仅在「iOS + TikTok 系 UA」时显示；关闭后本次会话不再打扰。 */
+  (function initInappTip() {
+    const tip = document.getElementById('inappTip');
+    if (!tip) return;
+
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    // musical_ly / trill 是 TikTok 的内核标识，BytedanceWebview 是字节系 WebView
+    const isInappTikTok = /musical_ly|TikTok|trill|BytedanceWebview|aweme|douyin/i.test(ua);
+    if (!isIOS || !isInappTikTok) return;
+
+    try {
+      if (sessionStorage.getItem('ranmoku.inappTip') === '1') return;
+    } catch (e) { /* 隐私模式下忽略 */ }
+
+    tip.hidden = false;
+    document.documentElement.classList.add('inapp-lock');
+
+    const close = () => {
+      tip.hidden = true;
+      document.documentElement.classList.remove('inapp-lock');
+      try { sessionStorage.setItem('ranmoku.inappTip', '1'); } catch (e) { /* 忽略 */ }
+    };
+
+    const btn = document.getElementById('inappClose');
+    if (btn) btn.addEventListener('click', close);
+    // 点遮罩也可关闭，避免用户被挡住无处可去
+    tip.addEventListener('click', (e) => {
+      if (e.target === tip || (e.target.classList && e.target.classList.contains('inapp-mask'))) close();
+    });
+  })();
 
   /* ---------- 启动 ---------- */
   syncClear();

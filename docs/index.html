@@ -38,7 +38,7 @@
   }
   </script>
   <!-- 构建时还会在下方自动插入：壁纸列表（noscript）+ 图片结构化数据 + sitemap.xml -->
-  <link rel="stylesheet" href="css/style.css?v=7f336ca8" />
+  <link rel="stylesheet" href="css/style.css?v=97009bda" />
 </head>
 <body>
 
@@ -222,11 +222,35 @@
   </div>
 
   <!-- 轻提示 -->
+  <!-- 应用内浏览器提示（TikTok 等）：默认隐藏，由 app.js 判断 UA 后显示。
+       箭头指向网页右上角 —— 那里正是 TikTok 顶栏的「•••」菜单位置 -->
+  <div id="inappTip" class="inapp-tip" hidden role="dialog" aria-modal="true" aria-labelledby="inappTitle">
+    <div class="inapp-mask"></div>
+    <div class="inapp-arrow" aria-hidden="true">
+      <svg width="112" height="112" viewBox="0 0 112 112" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 104C38 66 58 46 88 32" stroke-dasharray="7 9" opacity="0.9" />
+        <polyline points="72 24 96 30 90 54" />
+      </svg>
+    </div>
+    <div class="inapp-card">
+      <div class="inapp-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M15.6 8.4 13 13l-4.6 2.6L11 11z" /></svg>
+      </div>
+      <h2 id="inappTitle" data-i18n="inapp.title">Open in Safari</h2>
+      <p data-i18n="inapp.desc">The in-app browser cannot download wallpapers properly.</p>
+      <ul class="inapp-steps">
+        <li><b>1</b><span data-i18n="inapp.step1">Tap the ••• menu at the top right</span></li>
+        <li><b>2</b><span data-i18n="inapp.step2">Choose “Open in Safari”</span></li>
+      </ul>
+      <button id="inappClose" class="inapp-btn" type="button" data-i18n="inapp.continue">Continue in TikTok</button>
+    </div>
+  </div>
+
   <div id="toast" class="toast" hidden></div>
 
   <!-- 多语言：须在 app.js 之前加载（提供 window.I18N） -->
-  <script src="js/i18n.js?v=7b199f64"></script>
-  <script src="js/app.js?v=8d86816c"></script>
+  <script src="js/i18n.js?v=88d9785b"></script>
+  <script src="js/app.js?v=8521e110"></script>
   <!-- 以下内容由构建脚本自动生成：无 JS 的爬虫（如百度）可读到全部壁纸；正常浏览时 <noscript> 不显示，也不会加载其中的图片 -->
   <noscript>
     <section style="max-width:920px;margin:24px auto;padding:0 16px">

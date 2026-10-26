@@ -778,3 +778,132 @@ body:has(.modal-backdrop:not([hidden])) .fab-admin {
   opacity: 0;
   pointer-events: none;
 }
+
+/* =========================================================
+   应用内浏览器提示（TikTok 等内嵌 WebView）
+   ---------------------------------------------------------
+   在 TikTok 里点开链接时，下载 / 长按保存等都会失效，
+   且无法用 JS 直接跳转到 Safari，因此引导用户点右上角「•••」。
+   仅当 app.js 判定为「iOS + TikTok 系 UA」时才显示（默认隐藏）。
+   注意：遮罩只覆盖网页区域，TikTok 自己的顶栏「•••」仍在遮罩之上，
+        所以用户依然能点到它，箭头正好指向那个位置。
+   =======================================================*/
+html.inapp-lock,
+html.inapp-lock body { overflow: hidden; }
+
+.inapp-tip {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+.inapp-tip[hidden] { display: none; }
+
+.inapp-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.84);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* 指向右上角「•••」的箭头：三角尖正好落在网页右上角 */
+.inapp-arrow {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  width: 112px;
+  height: 112px;
+  color: #fff;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6));
+  animation: inappPulse 1.6s ease-in-out infinite;
+}
+.inapp-arrow svg { display: block; width: 100%; height: 100%; }
+
+/* 说明文案集中在卡片里，箭头旁不再单加标签，避免小屏拥挤 */
+
+/* 居中提示卡片 */
+.inapp-card {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  width: min(340px, calc(100vw - 44px));
+  padding: 22px 20px 16px;
+  text-align: center;
+  color: #f0f0f4;
+  background: linear-gradient(160deg, #1d1d24, #141419);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 22px;
+  box-shadow: 0 26px 64px rgba(0, 0, 0, .62);
+}
+.inapp-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 14px;
+}
+.inapp-icon svg { width: 24px; height: 24px; }
+.inapp-card h2 { font-size: 17.5px; font-weight: 700; margin-bottom: 7px; }
+.inapp-card p { font-size: 13.5px; line-height: 1.55; color: #a9a9b4; }
+
+.inapp-steps {
+  margin: 14px 0 15px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.inapp-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 12px;
+}
+.inapp-steps b {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #101014;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.inapp-btn {
+  width: 100%;
+  height: 42px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #c9c9d2;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.inapp-btn:active { transform: scale(.98); }
+
+/* 用透明度脉冲代替位移动画：transform 动画会创建合成层，
+   部分 WebView 下会出现「元素存在但不绘制」的问题；透明度动画各端都稳定 */
+@keyframes inappPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}

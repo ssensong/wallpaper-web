@@ -70,7 +70,14 @@
       'tut.q2': 'Q：使用一段时间后 App 打不开了（掉签）？',
       'tut.a2': 'A：说明签名已过期，重新回到第 1 步的签名网站再次签名即可恢复。',
       'tut.q3': 'Q：下载链接失效了怎么办？',
-      'tut.a3': 'A：可稍后再试或刷新页面；如果长期失效可联系站长更新链接。'
+      'tut.a3': 'A：可稍后再试或刷新页面；如果长期失效可联系站长更新链接。',
+
+      'inapp.hint': '点这里',
+      'inapp.title': '请用 Safari 打开',
+      'inapp.desc': '当前应用内置浏览器无法正常下载壁纸。',
+      'inapp.step1': '点击右上角的「•••」',
+      'inapp.step2': '选择「在 Safari 中打开」',
+      'inapp.continue': '继续在应用内浏览'
     },
     en: {
       'meta.title': 'Ranmoku Wallpapers · Original iOS Interactive Wallpapers',
@@ -120,7 +127,14 @@
       'tut.q2': 'Q: The app stopped opening after a while (revoked certificate)?',
       'tut.a2': 'A: The signature has expired. Go back to step 1 and sign it again on the signing site.',
       'tut.q3': 'Q: What if a download link stops working?',
-      'tut.a3': 'A: Try again later or refresh the page. If it stays broken, contact the site owner to update the link.'
+      'tut.a3': 'A: Try again later or refresh the page. If it stays broken, contact the site owner to update the link.',
+
+      'inapp.hint': 'Tap here',
+      'inapp.title': 'Open in Safari',
+      'inapp.desc': 'The built-in browser cannot download wallpapers properly.',
+      'inapp.step1': 'Tap the ••• menu at the top right',
+      'inapp.step2': 'Choose “Open in Safari”',
+      'inapp.continue': 'Continue anyway'
     }
   };
 
