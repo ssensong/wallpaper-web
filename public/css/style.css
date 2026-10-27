@@ -617,6 +617,46 @@ html[lang="en"] .brand-sub {
   background: linear-gradient(#f2f2f3, #7d7d88);
 }
 
+/* 教程入口按钮（替代原来的视频播放器）：点击打开图文教程界面 */
+.tut-guide-btns { display: flex; flex-direction: column; gap: 10px; }
+.tut-guide-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  text-align: left;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .2s, background .2s, transform .15s;
+}
+.tut-guide-btn:hover { background: var(--card-hover); border-color: #3d3d47; }
+.tut-guide-btn:active { transform: scale(.99); }
+.tut-guide-icon {
+  flex: 0 0 auto;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  color: var(--text-sub);
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--line);
+}
+.tut-guide-icon svg { width: 17px; height: 17px; }
+.tut-guide-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.tut-guide-text strong { font-size: 14px; font-weight: 600; }
+.tut-guide-text small { font-size: 12px; color: var(--muted); }
+.tut-guide-arrow { flex: 0 0 auto; width: 16px; height: 16px; color: var(--muted); }
+
 /* 视频预留区：窗口已缩小并居中展示（宽度可改下面 max-width 调整大小） */
 .video-slot {
   aspect-ratio: 16 / 9;

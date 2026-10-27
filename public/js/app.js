@@ -425,9 +425,8 @@
     if (e.target === modalBackdrop) closeModal();
   });
   document.addEventListener('keydown', (e) => {
-    // 下载教程界面盖在弹窗之上时，Esc 只退出教程，不连带关掉壁纸详情
-    const guideOpen = dlGuide && !dlGuide.hidden;
-    if (e.key === 'Escape' && !modalBackdrop.hidden && !guideOpen) closeModal();
+    // 图文教程界面盖在弹窗之上时，Esc 只退出教程，不连带关掉壁纸详情
+    if (e.key === 'Escape' && !modalBackdrop.hidden && !isGuideOpen()) closeModal();
   });
 
   // 下载按钮防呆：未填写网盘链接时给出提示，绝不跳回当前页
@@ -479,29 +478,41 @@
     });
   }
 
-  /* ---------- 壁纸下载教程：独立界面（与「教程」页互不相干） ---------- */
-  const dlGuide = $('#downloadGuide');
-  const dlGuideBody = dlGuide ? dlGuide.querySelector('.dl-guide-body') : null;
+/* ---------- 图文教程界面（下载教程 / 导入教程共用） ---------- */
+// 界面盖在壁纸详情弹窗之上：不关闭弹窗，退出后原样回到这张壁纸
+const GUIDE_SECTIONS = Array.prototype.slice.call(document.querySelectorAll('.dl-guide'));
 
-  // 不关闭壁纸详情弹窗：教程界面盖在它上面，退出后原样回到这张壁纸
-  function openDownloadGuide() {
-    if (!dlGuide) return;
-    dlGuide.hidden = false;
-    document.documentElement.classList.add('dl-lock');
-    if (dlGuideBody) dlGuideBody.scrollTop = 0;
-  }
+function openGuide(section) {
+  if (!section) return;
+  section.hidden = false;
+  document.documentElement.classList.add('dl-lock');
+  const body = section.querySelector('.dl-guide-body');
+  if (body) body.scrollTop = 0;
+}
 
-  function closeDownloadGuide() {
-    if (!dlGuide || dlGuide.hidden) return;
-    dlGuide.hidden = true;
-    document.documentElement.classList.remove('dl-lock');
-  }
+function closeGuides() {
+  let closed = false;
+  GUIDE_SECTIONS.forEach((sec) => {
+    if (!sec.hidden) { sec.hidden = true; closed = true; }
+  });
+  if (closed) document.documentElement.classList.remove('dl-lock');
+}
 
-  const modalGuide = $('#modalGuide');
-  if (modalGuide) modalGuide.addEventListener('click', openDownloadGuide);
+function isGuideOpen() {
+  return GUIDE_SECTIONS.some((sec) => !sec.hidden);
+}
 
-  const dlGuideBack = $('#dlGuideBack');
-  if (dlGuideBack) dlGuideBack.addEventListener('click', closeDownloadGuide);
+const modalGuide = $('#modalGuide');
+if (modalGuide) modalGuide.addEventListener('click', () => openGuide($('#downloadGuide')));
+
+// 教程页里的两个入口按钮（下载教程 / 导入教程）
+document.querySelectorAll('[data-guide-open]').forEach((btn) => {
+  btn.addEventListener('click', () => openGuide(document.getElementById(btn.getAttribute('data-guide-open'))));
+});
+// 各教程界面左上角的返回按钮
+document.querySelectorAll('.dl-guide-back').forEach((btn) => {
+  btn.addEventListener('click', closeGuides);
+});
 
   /* ---------- 语言切换：重绘已渲染内容（静态文案由 i18n.js 负责） ---------- */
   document.addEventListener('langchange', () => {
@@ -592,148 +603,155 @@
     });
   })();
 
-  /* ---------- 壁纸下载流程：图片步骤轮播 + 全屏大图查看 ---------- */
-  (function initGuide() {
-    const track = $('#guideTrack');
-    const viewer = $('#guideViewer');
-    if (!track || !viewer) return;
+/* ---------- 图文教程：步骤轮播 + 全屏大图（下载 / 导入两套共用） ---------- */
+(function initGuides() {
+  const viewer = $('#guideViewer');
+  if (!viewer || !GUIDE_SECTIONS.length) return;
 
+  const viewerImg = $('#guideViewerImg');
+  const viewerCap = $('#guideViewerCap');
+  const counter = $('#guideCounter');
+  const prevBtn = $('#guidePrev');
+  const nextBtn = $('#guideNext');
+  const closeBtn = $('#guideViewerClose');
+
+  let active = null; // 当前查看大图所属的教程
+  let index = 0;
+
+  function render() {
+    if (!active) return;
+    const step = active.steps[index];
+    const img = step ? step.querySelector('.guide-shot img') : null;
+    const title = active.titleOf(index);
+    if (viewerImg) {
+      viewerImg.setAttribute('src', img ? img.getAttribute('src') : '');
+      viewerImg.setAttribute('alt', title);
+    }
+    if (viewerCap) viewerCap.textContent = title;
+    if (counter) counter.textContent = (index + 1) + ' / ' + active.steps.length;
+    if (prevBtn) prevBtn.disabled = index === 0;
+    if (nextBtn) nextBtn.disabled = index === active.steps.length - 1;
+  }
+
+  function openViewer(guide, i) {
+    active = guide;
+    index = i;
+    render();
+    viewer.hidden = false;
+    document.documentElement.classList.add('guide-lock');
+  }
+
+  function closeViewer() {
+    if (viewer.hidden) return;
+    viewer.hidden = true;
+    document.documentElement.classList.remove('guide-lock');
+    if (viewerImg) viewerImg.removeAttribute('src');
+  }
+
+  function go(delta) {
+    if (!active) return;
+    const next = index + delta;
+    if (next < 0 || next >= active.steps.length) return;
+    index = next;
+    render();
+    // 关掉大图后轮播停在当前步骤
+    active.scrollToStep(index);
+  }
+
+  /* ---------- 为每个教程界面建立步骤轨道 ---------- */
+  GUIDE_SECTIONS.forEach((section) => {
+    const track = section.querySelector('.guide-track');
+    const dotsBox = section.querySelector('.guide-dots');
+    if (!track) return;
     const steps = Array.prototype.slice.call(track.querySelectorAll('.guide-step'));
     if (!steps.length) return;
 
-    const imgs = steps.map((el) => el.querySelector('.guide-shot img'));
-    const titleEls = steps.map((el) => el.querySelector('.guide-step-title [data-i18n]') || el.querySelector('.guide-step-title'));
-    const dotsBox = $('#guideDots');
-    const viewerImg = $('#guideViewerImg');
-    const viewerCap = $('#guideViewerCap');
-    const counter = $('#guideCounter');
-    const prevBtn = $('#guidePrev');
-    const nextBtn = $('#guideNext');
-    const closeBtn = $('#guideViewerClose');
-
     const padLeft = () => parseFloat(getComputedStyle(track).paddingLeft) || 0;
     const stepLeft = (i) => Math.max(0, steps[i].offsetLeft - padLeft());
-    const stepTitle = (i) => (titleEls[i] ? titleEls[i].textContent.trim() : '');
+    const scrollToStep = (i) => {
+      try { track.scrollTo({ left: stepLeft(i), behavior: 'smooth' }); } catch (e) { track.scrollLeft = stepLeft(i); }
+    };
+    const titleOf = (i) => {
+      const el = steps[i].querySelector('.guide-step-title > span:last-child');
+      return el ? el.textContent.trim() : '';
+    };
+    const guide = { section, track, steps, titleOf, scrollToStep };
 
-    /* ---------- 底部圆点 ---------- */
+    // 底部圆点
     const dots = steps.map((el, i) => {
       const dot = document.createElement('button');
       dot.type = 'button';
       dot.className = 'guide-dot' + (i === 0 ? ' active' : '');
       dot.setAttribute('aria-label', String(i + 1));
-      dot.addEventListener('click', () => {
-        try { track.scrollTo({ left: stepLeft(i), behavior: 'smooth' }); } catch (e) { track.scrollLeft = stepLeft(i); }
-      });
+      dot.addEventListener('click', () => scrollToStep(i));
       if (dotsBox) dotsBox.appendChild(dot);
       return dot;
     });
 
     // 滑动时按「离左边缘最近的卡片」点亮圆点
-    function currentIndex() {
-      const base = padLeft();
-      let best = 0;
-      let bestGap = Infinity;
-      steps.forEach((el, i) => {
-        const gap = Math.abs(el.offsetLeft - base - track.scrollLeft);
-        if (gap < bestGap) { bestGap = gap; best = i; }
-      });
-      return best;
-    }
     let ticking = false;
     track.addEventListener('scroll', () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         ticking = false;
-        const i = currentIndex();
-        dots.forEach((dot, k) => dot.classList.toggle('active', k === i));
+        const base = padLeft();
+        let best = 0;
+        let bestGap = Infinity;
+        steps.forEach((el, i) => {
+          const gap = Math.abs(el.offsetLeft - base - track.scrollLeft);
+          if (gap < bestGap) { bestGap = gap; best = i; }
+        });
+        dots.forEach((dot, k) => dot.classList.toggle('active', k === best));
       });
     }, { passive: true });
 
-    /* ---------- 大图查看器 ---------- */
-    let index = 0;
-
-    function render() {
-      const src = imgs[index] ? imgs[index].getAttribute('src') : '';
-      if (viewerImg) {
-        viewerImg.setAttribute('src', src);
-        viewerImg.setAttribute('alt', stepTitle(index));
-      }
-      if (viewerCap) viewerCap.textContent = stepTitle(index);
-      if (counter) counter.textContent = (index + 1) + ' / ' + steps.length;
-      if (prevBtn) prevBtn.disabled = index === 0;
-      if (nextBtn) nextBtn.disabled = index === steps.length - 1;
-    }
-
-    function open(i) {
-      index = Math.max(0, Math.min(steps.length - 1, i));
-      render();
-      viewer.hidden = false;
-      document.documentElement.classList.add('guide-lock');
-    }
-
-    function close() {
-      if (viewer.hidden) return;
-      viewer.hidden = true;
-      document.documentElement.classList.remove('guide-lock');
-      if (viewerImg) viewerImg.removeAttribute('src');
-    }
-
-    function go(delta) {
-      const next = index + delta;
-      if (next < 0 || next >= steps.length) return;
-      index = next;
-      render();
-      // 关掉大图后轮播停在当前步骤
-      try { track.scrollTo({ left: stepLeft(index), behavior: 'smooth' }); } catch (e) { track.scrollLeft = stepLeft(index); }
-    }
-
+    // 点击缩略图看大图
     steps.forEach((el, i) => {
       const shot = el.querySelector('.guide-shot');
-      if (shot) shot.addEventListener('click', () => open(i));
+      if (shot) shot.addEventListener('click', () => openViewer(guide, i));
     });
+  });
 
-    if (prevBtn) prevBtn.addEventListener('click', () => go(-1));
-    if (nextBtn) nextBtn.addEventListener('click', () => go(1));
-    if (closeBtn) closeBtn.addEventListener('click', close);
-    // 点击空白区域关闭（图片本身不关闭）
-    viewer.addEventListener('click', (e) => {
-      if (e.target === viewer || e.target.classList.contains('guide-viewer-stage')) close();
-    });
+  if (prevBtn) prevBtn.addEventListener('click', () => go(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => go(1));
+  if (closeBtn) closeBtn.addEventListener('click', closeViewer);
+  // 点击空白区域关闭（图片本身不关闭）
+  viewer.addEventListener('click', (e) => {
+    if (e.target === viewer || e.target.classList.contains('guide-viewer-stage')) closeViewer();
+  });
 
-    // 键盘：左右切换 / Esc 关闭
-    document.addEventListener('keydown', (e) => {
-      if (viewer.hidden) return;
-      if (e.key === 'Escape') close();
-      else if (e.key === 'ArrowLeft') go(-1);
-      else if (e.key === 'ArrowRight') go(1);
-    });
+  // 键盘：左右切换 / Esc 关闭
+  document.addEventListener('keydown', (e) => {
+    if (viewer.hidden) {
+      if (e.key === 'Escape') closeGuides();
+      return;
+    }
+    if (e.key === 'Escape') closeViewer();
+    else if (e.key === 'ArrowLeft') go(-1);
+    else if (e.key === 'ArrowRight') go(1);
+  });
 
-    // 手势：左右滑动切换
-    let startX = 0;
-    let startY = 0;
-    viewer.addEventListener('touchstart', (e) => {
-      if (e.touches.length !== 1) return;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    }, { passive: true });
-    viewer.addEventListener('touchend', (e) => {
-      if (!e.changedTouches.length) return;
-      const dx = e.changedTouches[0].clientX - startX;
-      const dy = e.changedTouches[0].clientY - startY;
-      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1);
-    }, { passive: true });
+  // 手势：左右滑动切换
+  let startX = 0;
+  let startY = 0;
+  viewer.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  viewer.addEventListener('touchend', (e) => {
+    if (!e.changedTouches.length) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1);
+  }, { passive: true });
 
-    // 中英切换后刷新大图文案
-    document.addEventListener('langchange', () => {
-      if (!viewer.hidden) render();
-    });
-
-    // Esc 关闭独立教程界面（大图查看器打开时优先交给它处理）
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && viewer.hidden) closeDownloadGuide();
-    });
-  })();
+  // 中英切换后刷新大图文案
+  document.addEventListener('langchange', () => {
+    if (!viewer.hidden) render();
+  });
+})();
 
   /* ---------- 启动 ---------- */
   syncClear();

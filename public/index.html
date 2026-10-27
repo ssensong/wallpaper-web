@@ -154,31 +154,20 @@
         </ol>
       </div>
 
-      <!-- 视频播放器预留区：将下方占位内容替换为你的视频嵌入代码即可 -->
+      <!-- 教程入口：用按钮替代原视频播放器，点开进入壁纸导入的图文教程 -->
       <div class="tut-card">
-        <h3 data-i18n="tut.video">视频教程</h3>
-        <!--
-          【如何填入你自己的视频】直接编辑本文件 public/index.html：
-
-          1) 找到下面 id 为 "videoSlot" 的 div；
-          2) 将其中的占位提示内容替换为 iframe / video 嵌入代码，例如：
-
-              B站：
-             <iframe src="//player.bilibili.com/player.html?bvid=你的视频BV号&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
-
-             腾讯视频：
-             <iframe src="//v.qq.com/txp/iframe/player.html?vid=你的视频vid" allowfullscreen="true"></iframe>
-
-             本地视频（文件放到 public/video/ 下）：
-             <video src="video/演示.mp4" controls></video>
-
-          3) 保存并刷新页面即可。窗口大小可调整 CSS 中 .video-slot 的 max-width。
-        -->
-        <div id="videoSlot" class="video-slot">
-          <!-- 本地视频：把视频文件放到 public/video/ 目录下，文件名保持 video/tutorial.mp4 即可。
-               preload="metadata"：页面打开时只预载几 KB 元数据，不下载 27MB 视频正文；
-               用户点播放时才流式加载（moov 在文件头部，可边下边播），避免首屏卡顿 -->
-          <video src="video/tutorial.mp4" controls playsinline preload="metadata"></video>
+        <h3 data-i18n="tut.guides">教程</h3>
+        <div class="tut-guide-btns">
+          <button class="tut-guide-btn" type="button" data-guide-open="importGuide">
+            <span class="tut-guide-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+            </span>
+            <span class="tut-guide-text">
+              <strong data-i18n="tut.guide.import">壁纸导入教程</strong>
+              <small data-i18n="tut.guide.importSub">19 步图文 · 从签名到导入生效</small>
+            </span>
+            <svg class="tut-guide-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
       </div>
 
@@ -218,14 +207,14 @@
   <!-- ============ 壁纸下载教程：独立界面（从壁纸详情的 Download guide 进入） ============ -->
   <section id="downloadGuide" class="dl-guide" hidden aria-labelledby="dlGuideTitle">
     <header class="dl-guide-bar">
-      <button id="dlGuideBack" class="dl-guide-back" type="button" aria-label="Back" data-i18n-aria="guide.back">
+      <button class="dl-guide-back" type="button" aria-label="Back" data-i18n-aria="guide.back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <h2 id="dlGuideTitle" data-i18n="guide.title">How to download</h2>
     </header>
     <div class="dl-guide-body">
       <p class="guide-hint" data-i18n="guide.sub">10 steps · swipe sideways, tap an image to enlarge</p>
-      <div id="guideTrack" class="guide-track">
+      <div class="guide-track">
         <figure class="guide-step">
           <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
             <img src="guide/step-01.jpg" alt="Tap Get wallpaper file" loading="lazy" decoding="async" data-i18n-alt="guide.s1.title" />
@@ -357,7 +346,270 @@
         </figure>
       </div>
 
-      <div id="guideDots" class="guide-dots" role="tablist" aria-label="Steps"></div>
+      <div class="guide-dots" role="tablist" aria-label="Steps"></div>
+    </div>
+  </section>
+
+  <!-- ============ 壁纸导入教程：独立界面（从教程页的按钮进入） ============ -->
+  <section id="importGuide" class="dl-guide" hidden aria-labelledby="impGuideTitle">
+    <header class="dl-guide-bar">
+      <button class="dl-guide-back" type="button" aria-label="Back" data-i18n-aria="guide.back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h2 id="impGuideTitle" data-i18n="imp.title">How to import</h2>
+    </header>
+    <div class="dl-guide-body">
+      <p class="guide-hint" data-i18n="imp.sub">19 steps · swipe sideways · tap an image to enlarge</p>
+      <div class="guide-track">
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-01.jpg" alt="Open the signing site in Safari" loading="lazy" decoding="async" data-i18n-alt="imp.s1.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">1</span><span data-i18n="imp.s1.title">Open the signing site in Safari</span></strong>
+            <p data-i18n="imp.s1.desc">Open the signing page in Safari (not an in-app browser) and tap the green “1: Install this profile” button.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-02.jpg" alt="Tap “Allow”" loading="lazy" decoding="async" data-i18n-alt="imp.s2.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">2</span><span data-i18n="imp.s2.title">Tap “Allow”</span></strong>
+            <p data-i18n="imp.s2.desc">Safari asks whether to download a configuration profile — tap “Allow”.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-03.jpg" alt="Open Settings → General" loading="lazy" decoding="async" data-i18n-alt="imp.s3.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">3</span><span data-i18n="imp.s3.title">Open Settings → General</span></strong>
+            <p data-i18n="imp.s3.desc">Open Settings, go to General, then tap “VPN & Device Management”.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-04.jpg" alt="Tap the downloaded profile" loading="lazy" decoding="async" data-i18n-alt="imp.s4.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">4</span><span data-i18n="imp.s4.title">Tap the downloaded profile</span></strong>
+            <p data-i18n="imp.s4.desc">Under Configuration Profiles, tap the “免费企业证书屏蔽验证” profile you just downloaded.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-05.jpg" alt="Tap “Install”" loading="lazy" decoding="async" data-i18n-alt="imp.s5.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">5</span><span data-i18n="imp.s5.title">Tap “Install”</span></strong>
+            <p data-i18n="imp.s5.desc">Tap “Install” at the top right and confirm. Do not remove this profile later, or the app will crash.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-06.jpg" alt="Pick a free certificate" loading="lazy" decoding="async" data-i18n-alt="imp.s6.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">6</span><span data-i18n="imp.s6.title">Pick a free certificate</span></strong>
+            <p data-i18n="imp.s6.desc">Back on the signing page, choose any free certificate (for example 【证书12】) to install the signing app.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-07.jpg" alt="Open the installed app" loading="lazy" decoding="async" data-i18n-alt="imp.s7.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">7</span><span data-i18n="imp.s7.title">Open the installed app</span></strong>
+            <p data-i18n="imp.s7.desc">If the downloaded app shows a cloud icon, delete it and try another certificate version.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-08.jpg" alt="“Untrusted Developer” alert" loading="lazy" decoding="async" data-i18n-alt="imp.s8.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">8</span><span data-i18n="imp.s8.title">“Untrusted Developer” alert</span></strong>
+            <p data-i18n="imp.s8.desc">iOS blocks the app with “Untrusted Enterprise Developer” — expected. Tap “Cancel” and trust the developer next.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-09.jpg" alt="Tap the enterprise app" loading="lazy" decoding="async" data-i18n-alt="imp.s9.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">9</span><span data-i18n="imp.s9.title">Tap the enterprise app</span></strong>
+            <p data-i18n="imp.s9.desc">Go to Settings → General → VPN & Device Management and tap the enterprise app at the bottom (Beihang University).</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-10.jpg" alt="Tap “Trust”" loading="lazy" decoding="async" data-i18n-alt="imp.s10.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">10</span><span data-i18n="imp.s10.title">Tap “Trust”</span></strong>
+            <p data-i18n="imp.s10.desc">Tap “Trust Beihang University” and confirm in the popup.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-11.jpg" alt="Accept the agreement" loading="lazy" decoding="async" data-i18n-alt="imp.s11.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">11</span><span data-i18n="imp.s11.title">Accept the agreement</span></strong>
+            <p data-i18n="imp.s11.desc">Open 小白签 PRO, read the agreement and tap “确认并进入” (Agree and continue).</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-12.jpg" alt="Get the device UDID" loading="lazy" decoding="async" data-i18n-alt="imp.s12.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">12</span><span data-i18n="imp.s12.title">Get the device UDID</span></strong>
+            <p data-i18n="imp.s12.desc">When the UDID prompt appears, tap “立即获取” (Get it now).</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-13.jpg" alt="Install the UDID profile" loading="lazy" decoding="async" data-i18n-alt="imp.s13.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">13</span><span data-i18n="imp.s13.title">Install the UDID profile</span></strong>
+            <p data-i18n="imp.s13.desc">A “小白签 APP 获取设备 UDID” profile is downloaded — install it in Settings → VPN & Device Management.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-14.jpg" alt="Open the Files tab" loading="lazy" decoding="async" data-i18n-alt="imp.s14.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">14</span><span data-i18n="imp.s14.title">Open the Files tab</span></strong>
+            <p data-i18n="imp.s14.desc">In 小白签, tap “文件” (Files) at the bottom, then open the “下载” (Downloads) folder.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-15.jpg" alt="Select the IPA you downloaded" loading="lazy" decoding="async" data-i18n-alt="imp.s15.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">15</span><span data-i18n="imp.s15.title">Select the IPA you downloaded</span></strong>
+            <p data-i18n="imp.s15.desc">Pick the tool IPA: 3105 for iOS 17–26, AirCard for iOS 27.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-16.jpg" alt="Tap “签名” (Sign)" loading="lazy" decoding="async" data-i18n-alt="imp.s16.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">16</span><span data-i18n="imp.s16.title">Tap “签名” (Sign)</span></strong>
+            <p data-i18n="imp.s16.desc">Tap the IPA, then choose “签名” (Sign) and wait until signing finishes.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-17.jpg" alt="Open the tool and import" loading="lazy" decoding="async" data-i18n-alt="imp.s17.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">17</span><span data-i18n="imp.s17.title">Open the tool and import</span></strong>
+            <p data-i18n="imp.s17.desc">Open the signed tool, tap “+” and choose “Import .tendies”.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-18.jpg" alt="Find the .tendies file" loading="lazy" decoding="async" data-i18n-alt="imp.s18.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">18</span><span data-i18n="imp.s18.title">Find the .tendies file</span></strong>
+            <p data-i18n="imp.s18.desc">Browse to where the wallpaper file was saved (usually Downloads) and select the .tendies file.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="guide-step">
+          <button class="guide-shot" type="button" aria-label="Enlarge" data-i18n-aria="guide.zoom">
+            <img src="guide/import-19.jpg" alt="Tap “Apply”" loading="lazy" decoding="async" data-i18n-alt="imp.s19.title" />
+            <span class="guide-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <strong class="guide-step-title"><span class="guide-num">19</span><span data-i18n="imp.s19.title">Tap “Apply”</span></strong>
+            <p data-i18n="imp.s19.desc">Tap “Apply”. Then go to Settings → Wallpaper → Add New Wallpaper → Collections to use it. On iOS 26+ set a built-in Collections wallpaper once first.</p>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="guide-dots" role="tablist" aria-label="Steps"></div>
     </div>
   </section>
 
